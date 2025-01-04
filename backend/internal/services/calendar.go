@@ -12,11 +12,13 @@ import (
 	"time"
 )
 
+// CalendarService handles Google Calendar integration and event management
 type CalendarService struct {
 	config  *config.CalendarConfig
 	service *calendar.Service
 }
 
+// NewCalendarService initializes calendar service with Google credentials
 func NewCalendarService(config *config.CalendarConfig) (*CalendarService, error) {
 	ctx := context.Background()
 
@@ -53,6 +55,7 @@ func NewCalendarService(config *config.CalendarConfig) (*CalendarService, error)
 	}, nil
 }
 
+// CreateEvent creates a calendar event and generates a Jitsi meet link
 func (s *CalendarService) CreateEvent(apt *models.Appointment) error {
 	// Generate Jitsi Meet room ID based on appointment ID
 	roomID := strings.ReplaceAll(apt.ID, "-", "")
@@ -82,6 +85,8 @@ func (s *CalendarService) CreateEvent(apt *models.Appointment) error {
 	return nil
 }
 
+// GetAvailableSlots returns available 30-minute slots between 9 AM to 5 PM
+// Considers existing appointments to determine availability - Further Resting Required
 func (s *CalendarService) GetAvailableSlots(start, end time.Time) ([]models.TimeSlot, error) {
 	fmt.Printf("Fetching events between %v and %v\n", start, end)
 
