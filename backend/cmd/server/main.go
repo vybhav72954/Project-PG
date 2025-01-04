@@ -13,18 +13,20 @@ import (
 )
 
 func main() {
-	// Load configuration
+	// Load application configuration from environment variables and .env file
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	// Initialize services
+	// Initialize Google Calendar service with credentials and configuration
 	calendarService, err := services.NewCalendarService(&cfg.Calendar)
 	if err != nil {
 		log.Fatalf("Failed to initialize calendar service: %v", err)
 	}
 
+	// Initialize email service for sending appointment confirmations
+	// Uses SMTP configuration from environment variables
 	emailService := services.NewEmailService(
 		cfg.Email.SenderEmail,
 		cfg.Email.SenderName,
@@ -33,22 +35,23 @@ func main() {
 		cfg.Email.Password,
 	)
 
+	// Initialize appointment service which coordinates between calendar and email services
 	appointmentService := services.NewAppointmentService(calendarService)
 
-	// Initialize handler
+	// Create HTTP handler with initialized services
 	handler := api.NewHandler(appointmentService, calendarService, emailService)
 
-	// Create router with global middleware
+	// Setup Chi router with middleware for logging, recovery, and request tracking
 	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.RequestID)
-	router.Use(middleware.RealIP)
+	router.Use(middleware.Logger)    // Log HTTP requests
+	router.Use(middleware.Recoverer) // Recover from panics
+	router.Use(middleware.RequestID) // Add unique ID to each request
+	router.Use(middleware.RealIP)    // Get real IP behind proxy
 
-	// Mount API routes
+	// Mount all API routes under /api path
 	router.Mount("/api", api.SetupRoutes(handler))
 
-	// Start server
+	// Start HTTP server on configured port
 	serverAddr := fmt.Sprintf(":%s", cfg.Server.Port)
 	log.Printf("Server starting on %s", serverAddr)
 	if err := http.ListenAndServe(serverAddr, router); err != nil {

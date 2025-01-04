@@ -7,16 +7,19 @@ import (
 	"time"
 )
 
+// AppointmentService orchestrates appointment creation using calendar and email services
 type AppointmentService struct {
 	calendarService *CalendarService
 }
 
+// NewAppointmentService initializes the appointment service
 func NewAppointmentService(calendarService *CalendarService) *AppointmentService {
 	return &AppointmentService{
 		calendarService: calendarService,
 	}
 }
 
+// CreateAppointment generates a new appointment with UUID and creates calendar event
 func (s *AppointmentService) CreateAppointment(req models.BookingRequest) (*models.Appointment, error) {
 
 	appointmentID := uuid.New().String() // Make sure you've imported "github.com/google/uuid"
@@ -40,6 +43,8 @@ func (s *AppointmentService) CreateAppointment(req models.BookingRequest) (*mode
 
 	return apt, nil
 }
+
+// GetAppointments and IsTimeSlotAvailable are placeholder methods for future implementation
 func (s *AppointmentService) GetAppointments(start, end time.Time) ([]models.Appointment, error) {
 	return []models.Appointment{}, nil
 }

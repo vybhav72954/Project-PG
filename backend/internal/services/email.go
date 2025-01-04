@@ -16,6 +16,7 @@ type EmailService struct {
 	password    string
 }
 
+// NewEmailService initializes email service with SMTP configuration
 func NewEmailService(senderEmail, senderName, smtpHost, smtpPort, password string) *EmailService {
 	return &EmailService{
 		senderEmail: senderEmail,
@@ -26,8 +27,10 @@ func NewEmailService(senderEmail, senderName, smtpHost, smtpPort, password strin
 	}
 }
 
+// SendAppointmentConfirmation sends HTML formatted confirmation email with meeting link
 func (s *EmailService) SendAppointmentConfirmation(apt *models.Appointment) error {
 	subject := "Appointment Confirmation"
+	// HTML for better rendering
 	body := fmt.Sprintf(`
         <html>
         <body>
@@ -57,6 +60,7 @@ func (s *EmailService) SendAppointmentConfirmation(apt *models.Appointment) erro
 	return s.sendEmail(apt.PatientEmail, subject, body)
 }
 
+// sendEmail handles the SMTP connection and email sending
 func (s *EmailService) sendEmail(to, subject, body string) error {
 	auth := smtp.PlainAuth("", s.senderEmail, s.password, s.smtpHost)
 
