@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/* src/app.css */
+:root {
+  /* Inspired by Schmidt Theme & Wireframes */
+  --color-background: #ffffff;
+  --color-text: #333333;
+  --color-text-light: #666666;
+  --color-border: #e0e0e0;
+  --color-input-bg: #f8f9fa; /* Light grey for input placeholder areas */
+  --color-placeholder-bg: #e9ecef; /* Slightly darker placeholder */
+  --color-accent: #007bff; /* Example Accent (like Schmidt's blue/teal) */
+  --color-accent-hover: #0056b3;
+  --color-disabled: #cccccc;
+  --color-modal-overlay: rgba(0, 0, 0, 0.6); /* For the blur effect */
+
+  --font-family-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  --border-radius: 8px; /* Soft rounded corners like wireframes */
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-sans);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+/* Basic button styling */
+.button {
+  display: inline-block;
+  padding: 10px 20px;
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  text-align: center;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+  font-size: 1rem;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--color-input-bg);
+}
+
+.button-primary {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.button-primary:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+  border-color: var(--color-accent-hover);
+}
+
+.button:disabled {
+  background-color: var(--color-disabled);
+  color: var(--color-text-light);
+  cursor: not-allowed;
+  border-color: var(--color-border);
+}
+
+/* Basic input styling */
+.input-field {
+  display: block;
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-background); /* Match button */
+  box-sizing: border-box; /* Include padding/border in width */
+  font-size: 1rem;
+}
+
+.input-field::placeholder {
+  color: var(--color-text-light);
+}
+
+.placeholder-block {
+  background-color: var(--color-placeholder-bg);
+  height: 40px; /* Example height */
+  border-radius: var(--border-radius);
+  margin-bottom: var(--spacing-md);
+}
+
+/* Style for blurring background when modal is open */
+body.modal-open .app-container > .main-content,
+body.modal-open .app-container > .about-section-container {
+  filter: blur(5px); /* Apply blur */
+  pointer-events: none; /* Prevent interaction with blurred background */
+  user-select: none;
+}
