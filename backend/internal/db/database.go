@@ -24,7 +24,7 @@ func New(dbPath string) (*Database, error) {
 		return nil, fmt.Errorf("creating database directory: %w", err)
 	}
 
-	conn, err := sql.Open("sqlite3", dbPath+"?_foreign_keys=on")
+	conn, err := sql.Open("sqlite", dbPath+"?_foreign_keys=on")
 	if err != nil {
 		return nil, fmt.Errorf("opening database: %w", err)
 	}

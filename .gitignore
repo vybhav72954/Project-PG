@@ -29,3 +29,15 @@ log
 backend_old/.env
 
 .idea
+
+backend/.env
+backend/credentials.json
+
+*.db
+*.sqlite
+*.sqlite3
+
+# OS files
+.DS_Store
+Thumbs.db
+
