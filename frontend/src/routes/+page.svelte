@@ -1,14 +1,7 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { siteConfig } from '$lib/config';
 
-  let currentSlide = 0;
-  const heroSlides = [
-    {
-      tagline: 'Natural | Gentle | Side-Effect Free',
-      title: 'HOMOEOPATHY',
-      subtitle: 'Trusted by Millions'
-    }
-  ];
+  const { doctor, contact } = siteConfig;
 
   const stats = [
     { number: '500+', label: 'Happy Patients' },
@@ -22,25 +15,19 @@
       step: 1,
       icon: 'fa-user-plus',
       title: 'Book Appointment',
-      description: 'Choose your preferred consultation type and select a convenient time slot.',
-      link: '/appointment',
-      linkText: 'Book Now'
+      description: 'Choose your preferred consultation type and select a convenient time slot.'
     },
     {
       step: 2,
       icon: 'fa-comments',
       title: 'Consult with Doctor',
-      description: 'Have a detailed consultation with Dr. Aditi via video or voice call.',
-      link: '/appointment',
-      linkText: 'Start Consultation'
+      description: 'Have a detailed consultation with Dr. Aditi via video or voice call.'
     },
     {
       step: 3,
       icon: 'fa-heart-pulse',
       title: 'Get Treatment',
-      description: 'Receive personalized homeopathic treatment plan and follow-up care.',
-      link: '/about',
-      linkText: 'Learn More'
+      description: 'Receive personalized homeopathic treatment plan and follow-up care.'
     }
   ];
 
@@ -78,48 +65,69 @@
 </script>
 
 <svelte:head>
-  <title>Friends2health Homoeo Clinic | Natural Healing</title>
+  <title>Friends2health Homoeo Clinic | Dr. Aditi Singh</title>
 </svelte:head>
 
-<!-- Hero Section -->
+<!-- Hero Section - Meet Dr. Aditi (FIRST) -->
 <section class="bg-gradient-hero min-h-[600px] flex items-center">
   <div class="container-custom w-full">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
       <!-- Left: Content -->
       <div class="text-center lg:text-left">
-        <p class="text-primary-500 font-medium tracking-wide mb-4">
-          Natural <span class="text-gray-400">|</span> Gentle <span class="text-gray-400">|</span> Side-Effect Free
+        <p class="text-primary-600 font-medium tracking-wide mb-2">
+          Welcome to Friends2health Homoeo Clinic
         </p>
-        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-primary-500 mb-4">
-          HOMOEOPATHY
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
+          Meet <span class="text-primary-500">{doctor.name}</span>
         </h1>
-        <p class="text-xl md:text-2xl text-gray-700 mb-8">
-          Trusted by Millions
+        <p class="text-lg text-gray-600 mb-2">
+          {doctor.title} • {doctor.experience} Years Experience
         </p>
+        <p class="text-gray-600 mb-6 max-w-lg">
+          Dedicated homeopathic physician providing natural, gentle, and side-effect free treatment.
+          Experience holistic healing from the comfort of your home.
+        </p>
+
+        <div class="space-y-2 mb-8">
+          <div class="flex items-center gap-3 justify-center lg:justify-start">
+            <i class="fas fa-graduation-cap text-primary-500 w-5"></i>
+            <span class="text-gray-700 text-sm">BHMS - {doctor.bhmsCollege}</span>
+          </div>
+          <div class="flex items-center gap-3 justify-center lg:justify-start">
+            <i class="fas fa-award text-primary-500 w-5"></i>
+            <span class="text-gray-700 text-sm">MD - {doctor.mdCollege}</span>
+          </div>
+        </div>
+
         <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
           <a href="/appointment" class="btn-primary text-lg px-8 py-4">
             Book Consultation
           </a>
           <a href="/about" class="btn-secondary text-lg px-8 py-4">
-            Know Your Doctor
+            Learn More
           </a>
         </div>
       </div>
-      
-      <!-- Right: Image placeholder -->
+
+      <!-- Right: Doctor Image Placeholder -->
       <div class="hidden lg:flex justify-center">
         <div class="relative">
-          <!-- Decorative leaves/plants background -->
-          <div class="w-96 h-96 bg-primary-100 rounded-full flex items-center justify-center">
-            <div class="text-center p-8">
-              <i class="fas fa-leaf text-7xl text-primary-500 mb-4"></i>
-              <p class="text-primary-600 font-medium">Natural Remedies</p>
-              <p class="text-primary-500 text-sm">for Holistic Healing</p>
+          <div class="w-96 h-[480px] bg-gradient-green rounded-2xl overflow-hidden shadow-xl">
+            <!-- Placeholder for doctor image -->
+            <img
+              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop&crop=top"
+              alt="Dr. Aditi Singh - Homeopathic Physician"
+              class="w-full h-full object-cover"
+            />
+            <!-- Overlay with name -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+              <p class="text-white font-bold text-xl">{doctor.name}</p>
+              <p class="text-white/80 text-sm">{doctor.title}</p>
             </div>
           </div>
-          <!-- Floating decorative elements -->
-          <div class="absolute -top-4 -right-4 w-16 h-16 bg-primary-300 rounded-full opacity-60"></div>
-          <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-primary-200 rounded-full opacity-60"></div>
+          <!-- Decorative elements -->
+          <div class="absolute -top-4 -right-4 w-20 h-20 bg-cta/30 rounded-full"></div>
+          <div class="absolute -bottom-6 -left-6 w-28 h-28 bg-primary-200 rounded-full opacity-60"></div>
         </div>
       </div>
     </div>
@@ -149,7 +157,7 @@
         Get the best <strong>homeopathic treatment</strong> from the comfort of your home in just 3 simple steps!
       </p>
     </div>
-    
+
     <div class="grid md:grid-cols-3 gap-8">
       {#each howItWorks as item}
         <div class="card-hover text-center p-8 border-2 border-primary-100 rounded-2xl">
@@ -162,10 +170,16 @@
             </span>
           </div>
           <h3 class="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-          <p class="text-gray-600 mb-6">{item.description}</p>
-          <a href={item.link} class="link-arrow">{item.linkText}</a>
+          <p class="text-gray-600">{item.description}</p>
         </div>
       {/each}
+    </div>
+
+    <div class="text-center mt-10">
+      <a href="/appointment" class="btn-primary">
+        <i class="fas fa-calendar-check mr-2"></i>
+        Get Started Now
+      </a>
     </div>
   </div>
 </section>
@@ -173,89 +187,76 @@
 <!-- Clinical Conditions -->
 <section class="section-alt">
   <div class="container-custom">
-    <div class="grid lg:grid-cols-2 gap-12 items-center">
-      <!-- Left: Condition grid -->
-      <div class="grid grid-cols-2 gap-4">
-        {#each conditions.slice(0, 4) as condition}
-          <div class="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-            <i class="fas {condition.icon} text-2xl text-primary-500 mb-3"></i>
-            <h4 class="font-semibold text-gray-900 mb-1">{condition.name}</h4>
-            <p class="text-sm text-gray-500">{condition.examples}</p>
-          </div>
-        {/each}
-      </div>
-      
-      <!-- Right: Content -->
-      <div>
-        <h2 class="section-title">Clinical Conditions</h2>
-        <p class="text-gray-600 mb-6">
-          We effectively treat more than <strong>50 common and uncommon</strong> clinical conditions using natural homeopathic remedies.
-        </p>
-        <p class="text-gray-600 mb-8">
-          From chronic skin disorders to respiratory issues, digestive problems to mental health concerns — our holistic approach addresses the root cause, not just the symptoms.
-        </p>
-        <a href="/appointment" class="btn-primary">
-          <i class="fas fa-calendar-check mr-2"></i>
-          Book Consultation
-        </a>
-      </div>
+    <div class="text-center mb-12">
+      <h2 class="section-title">Conditions We Treat</h2>
+      <p class="section-subtitle">
+        We effectively treat more than <strong>50 common and uncommon</strong> clinical conditions using natural homeopathic remedies.
+      </p>
     </div>
-    
-    <!-- More conditions -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-      {#each conditions.slice(4) as condition}
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {#each conditions as condition}
         <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-          <i class="fas {condition.icon} text-xl text-primary-500 mb-2"></i>
-          <h4 class="font-semibold text-gray-900 text-sm mb-1">{condition.name}</h4>
-          <p class="text-xs text-gray-500">{condition.examples}</p>
+          <i class="fas {condition.icon} text-2xl text-primary-500 mb-3"></i>
+          <h4 class="font-semibold text-gray-900 mb-1">{condition.name}</h4>
+          <p class="text-sm text-gray-500">{condition.examples}</p>
         </div>
       {/each}
     </div>
   </div>
 </section>
 
-<!-- Meet the Doctor -->
+<!-- Why Homeopathy -->
 <section class="section">
   <div class="container-custom">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
-      <!-- Left: Content -->
-      <div>
-        <h2 class="section-title">Meet Dr. Aditi Singh</h2>
-        <p class="text-gray-600 mb-4">
-          Dr. Aditi Singh is a dedicated homeopathic physician with <strong>3+ years of clinical experience</strong>. Her patient-centered approach focuses on understanding the complete health picture before prescribing treatment.
-        </p>
-        <div class="space-y-3 mb-6">
-          <div class="flex items-start gap-3">
-            <i class="fas fa-graduation-cap text-primary-500 mt-1"></i>
-            <div>
-              <p class="font-medium text-gray-900">BHMS</p>
-              <p class="text-sm text-gray-600">Homoeopathic Medical College & Hospital, Chandigarh</p>
-            </div>
-          </div>
-          <div class="flex items-start gap-3">
-            <i class="fas fa-award text-primary-500 mt-1"></i>
-            <div>
-              <p class="font-medium text-gray-900">MD (Homoeopathy)</p>
-              <p class="text-sm text-gray-600">National Institute of Homoeopathy, New Delhi</p>
-            </div>
-          </div>
-        </div>
-        <div class="flex gap-4">
-          <a href="/about" class="btn-secondary">Learn More</a>
-          <a href="/appointment" class="btn-primary">Book Appointment</a>
-        </div>
-      </div>
-      
-      <!-- Right: Image placeholder -->
+      <!-- Left: Image -->
       <div class="flex justify-center">
         <div class="relative">
-          <div class="w-80 h-96 bg-gradient-green rounded-2xl flex items-center justify-center">
-            <div class="text-center">
-              <div class="w-32 h-32 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-                <i class="fas fa-user-doctor text-5xl text-primary-500"></i>
-              </div>
-              <p class="text-primary-700 font-semibold">Dr. Aditi Singh</p>
-              <p class="text-primary-600 text-sm">BHMS, MD (Hom)</p>
+          <img
+            src="https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=500&h=400&fit=crop"
+            alt="Natural homeopathic remedies"
+            class="rounded-2xl shadow-lg w-full max-w-md"
+          />
+          <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-primary-100 rounded-full -z-10"></div>
+        </div>
+      </div>
+
+      <!-- Right: Content -->
+      <div>
+        <h2 class="section-title">Why Choose Homeopathy?</h2>
+        <p class="text-gray-600 mb-6">
+          Homeopathy treats the person as a whole, addressing the root cause of illness rather than just suppressing symptoms.
+        </p>
+
+        <div class="space-y-4">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-leaf text-primary-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">100% Natural</h4>
+              <p class="text-sm text-gray-600">Made from natural substances with no harmful chemicals</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-shield-heart text-primary-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">No Side Effects</h4>
+              <p class="text-sm text-gray-600">Safe for all ages including children and elderly</p>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-bullseye text-primary-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">Treats Root Cause</h4>
+              <p class="text-sm text-gray-600">Addresses underlying issues, not just symptoms</p>
             </div>
           </div>
         </div>
@@ -271,25 +272,22 @@
       <h2 class="section-title">What Our Patients Say</h2>
       <p class="section-subtitle">Real stories from real patients</p>
     </div>
-    
+
     <div class="grid md:grid-cols-3 gap-8">
       {#each testimonials as testimonial}
         <div class="bg-white p-6 rounded-2xl shadow-sm">
-          <!-- Avatar -->
           <div class="flex items-center gap-4 mb-4">
-            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-              <i class="fas fa-user text-gray-400"></i>
+            <div class="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center">
+              <i class="fas fa-user text-primary-500"></i>
             </div>
             <div>
               <p class="font-semibold text-gray-900">{testimonial.name}</p>
               <p class="text-sm text-primary-600">{testimonial.condition}</p>
             </div>
           </div>
-          
-          <!-- Review -->
+
           <p class="text-gray-600 mb-4">"{testimonial.text}"</p>
-          
-          <!-- Rating -->
+
           <div class="flex gap-1">
             {#each Array(testimonial.rating) as _}
               <i class="fas fa-star text-cta"></i>
@@ -298,7 +296,7 @@
         </div>
       {/each}
     </div>
-    
+
     <div class="text-center mt-8">
       <a href="/testimonials" class="btn-secondary">
         View All Testimonials
@@ -327,17 +325,17 @@
 <section class="bg-gray-50 py-8 border-t border-gray-100">
   <div class="container-custom">
     <div class="flex flex-col md:flex-row justify-center items-center gap-8 text-center">
-      <a href="tel:+919877505344" class="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
+      <a href="tel:{contact.phoneRaw}" class="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
         <i class="fas fa-phone text-primary-500"></i>
-        <span>+91-9877505344</span>
+        <span>{contact.phone}</span>
       </a>
-      <a href="https://wa.me/919877505344" target="_blank" rel="noopener" class="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
+      <a href="https://wa.me/{contact.whatsapp}" target="_blank" rel="noopener" class="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
         <i class="fab fa-whatsapp text-primary-500"></i>
         <span>WhatsApp Us</span>
       </a>
-      <a href="mailto:contact@friends2health.com" class="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
+      <a href="mailto:{contact.email}" class="flex items-center gap-2 text-gray-600 hover:text-primary-600 transition-colors">
         <i class="fas fa-envelope text-primary-500"></i>
-        <span>contact@friends2health.com</span>
+        <span>{contact.email}</span>
       </a>
     </div>
   </div>
