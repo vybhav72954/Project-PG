@@ -1,48 +1,22 @@
-# Friends2health Homoeo Clinic Website
+# Friends2Health Homoeo Clinic Website
 
-A full-stack appointment booking website for a homeopathy clinic with payment integration, calendar sync, email notifications, and **admin panel**.
-
-## 🏗️ Architecture
-
-```
-dr-aditi-website/
-├── backend/                 # Go API server
-│   ├── cmd/server/          # Entry point (main.go)
-│   ├── internal/
-│   │   ├── api/             # HTTP handlers & routes (+ admin)
-│   │   ├── config/          # Environment configuration
-│   │   ├── db/              # SQLite database
-│   │   ├── models/          # Data structures
-│   │   └── services/        # Calendar, Email, Payment
-│   ├── go.mod
-│   └── .env.example
-│
-└── frontend/                # SvelteKit application
-    ├── src/
-    │   ├── lib/             # Shared code (API client, stores, adminApi)
-    │   └── routes/          
-    │       ├── admin/       # 🆕 Admin panel pages
-    │       └── ...          # Public pages
-    ├── static/              # Static assets
-    └── package.json
-```
-
+Complete code for Dr Aditi Singh's Homoeopathy Clinic **Friends2Health**
 ## ✨ Features
 
 ### Patient Features
-- 📅 Online appointment booking
-- 💳 Razorpay payment integration
-- 📧 Email confirmations
-- 📞 Video/Voice consultation options
+- Online appointment booking
+- Razorpay payment integration
+- Email confirmations
+- Video/Voice consultation options
 
-### Admin Panel (NEW!)
-- 📊 Dashboard with stats
-- 📋 Appointment management (view, complete, cancel)
-- 👥 Patient list with history
-- ⭐ Testimonials management (CRUD)
-- 🚫 Block dates (holidays/vacations)
+### Admin Panel
+- Dashboard with stats
+- Appointment management (view, complete, cancel)
+- Patient list with history
+- Testimonials management
+- Block dates (holidays/vacations)
 
-## 📋 Prerequisites
+## Prerequisites
 
 Before you start, make sure you have:
 
@@ -57,9 +31,7 @@ Before you start, make sure you have:
    npm --version
    ```
 
-3. **Git** (optional, for version control)
-
-## 🚀 Quick Start (Development Mode)
+## Quick Start
 
 ### Step 1: Setup Backend
 
@@ -96,16 +68,11 @@ The frontend will start at `http://localhost:5173`
 
 ### Step 3: Open in Browser
 
-Visit `http://localhost:5173` - the site should be fully functional!
+Visit `http://localhost:5173`
 
 ### Step 4: Access Admin Panel
 
 Visit `http://localhost:5173/admin`
-
-- **Default Password**: `admin123`
-- Change this in `.env` file: `ADMIN_PASSWORD=your-secure-password`
-
-> **Note**: Without configuring Razorpay, payments are simulated. Without email/calendar config, those features are skipped but bookings still work.
 
 ---
 
@@ -386,4 +353,4 @@ For issues with this codebase, check:
 
 ## 📄 License
 
-Private project for Friends2health Homoeo Clinic.
+Private project for Friends2Health Homoeo Clinic.

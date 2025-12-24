@@ -22,7 +22,7 @@ go.work.sum
 # env file
 backend_old/.env
 backend_old/credentials.json
-folder
+folder_structure
 *.log
 log
 
