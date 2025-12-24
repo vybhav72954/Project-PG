@@ -20,12 +20,12 @@ go.work
 go.work.sum
 
 # env file
-backend/.env
-backend/credentials.json
+backend_old/.env
+backend_old/credentials.json
 folder
 *.log
 log
 
-backend/.env
+backend_old/.env
 
 .idea
