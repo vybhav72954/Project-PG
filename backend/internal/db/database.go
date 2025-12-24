@@ -477,21 +477,29 @@ func (db *Database) GetAllPatients() ([]models.PatientSummary, error) {
 			MAX(start_time) as last_appointment,
 			MIN(created_at) as first_visit
 		FROM appointments
-		WHERE status = 'confirmed'
+		WHERE status != 'cancelled'
 		GROUP BY patient_email
 		ORDER BY last_appointment DESC
 	`)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
 
 	var patients []models.PatientSummary
 	for rows.Next() {
 		var p models.PatientSummary
-		if err := rows.Scan(&p.Email, &p.Name, &p.Phone, &p.AppointmentCount, &p.LastAppointment, &p.FirstVisit); err != nil {
-			return nil, err
+		var lastAppt, firstVisit string
+
+		// Scan timestamps as strings first
+		if err := rows.Scan(&p.Email, &p.Name, &p.Phone, &p.AppointmentCount, &lastAppt, &firstVisit); err != nil {
+			return nil, fmt.Errorf("scan error: %w", err)
 		}
+
+		// Parse the string timestamps into time.Time
+		p.LastAppointment, _ = time.Parse("2006-01-02 15:04:05", lastAppt)
+		p.FirstVisit, _ = time.Parse("2006-01-02 15:04:05", firstVisit)
+
 		patients = append(patients, p)
 	}
 
