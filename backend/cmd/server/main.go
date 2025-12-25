@@ -47,6 +47,11 @@ func main() {
 	// Setup routes
 	router := api.SetupRoutes(handler, adminHandler, cfg.Server.FrontendURL)
 
+	// Start reminder scheduler
+	reminderScheduler := services.NewReminderScheduler(database, emailService)
+	reminderScheduler.Start()
+	defer reminderScheduler.Stop()
+
 	// Start cleanup goroutine for expired pending appointments
 	go func() {
 		ticker := time.NewTicker(5 * time.Minute)
