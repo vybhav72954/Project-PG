@@ -42,6 +42,38 @@
     { name: "Children's Care", icon: 'fa-baby', examples: 'Growth, Immunity, Behavior' }
   ];
 
+  // Success stories - before/after cases
+  const successStories = [
+    {
+      condition: 'Eczema Treatment',
+      duration: '3 months',
+      beforeImg: 'https://placehold.co/300x200/fee2e2/991b1b?text=Before',
+      afterImg: 'https://placehold.co/300x200/dcfce7/166534?text=After',
+      description: 'Chronic eczema cleared with constitutional treatment'
+    },
+    {
+      condition: 'Hair Restoration',
+      duration: '6 months',
+      beforeImg: 'https://placehold.co/300x200/fee2e2/991b1b?text=Before',
+      afterImg: 'https://placehold.co/300x200/dcfce7/166534?text=After',
+      description: 'Significant hair regrowth with homeopathic remedies'
+    },
+    {
+      condition: 'Psoriasis Recovery',
+      duration: '4 months',
+      beforeImg: 'https://placehold.co/300x200/fee2e2/991b1b?text=Before',
+      afterImg: 'https://placehold.co/300x200/dcfce7/166534?text=After',
+      description: 'Psoriasis patches healed naturally'
+    },
+    {
+      condition: 'Acne Cure',
+      duration: '2 months',
+      beforeImg: 'https://placehold.co/300x200/fee2e2/991b1b?text=Before',
+      afterImg: 'https://placehold.co/300x200/dcfce7/166534?text=After',
+      description: 'Clear skin achieved without harsh chemicals'
+    }
+  ];
+
   const testimonials = [
     {
       name: 'Priya M.',
@@ -109,11 +141,10 @@
         </div>
       </div>
 
-      <!-- Right: Doctor Image Placeholder -->
+      <!-- Right: Doctor Image -->
       <div class="hidden lg:flex justify-center">
         <div class="relative">
           <div class="w-96 h-[480px] bg-gradient-green rounded-2xl overflow-hidden shadow-xl">
-            <!-- Placeholder for doctor image -->
             <img
               src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop&crop=top"
               alt="Dr. Aditi Singh - Homeopathic Physician"
@@ -194,6 +225,7 @@
       </p>
     </div>
 
+    <!-- Conditions Grid -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
       {#each conditions as condition}
         <div class="bg-white p-5 rounded-xl shadow-sm hover:shadow-md transition-shadow">
@@ -210,15 +242,31 @@
 <section class="section">
   <div class="container-custom">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
-      <!-- Left: Image -->
-      <div class="flex justify-center">
-        <div class="relative">
+      <!-- Left: Image Grid -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-4">
           <img
-            src="https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=500&h=400&fit=crop"
-            alt="Natural homeopathic remedies"
-            class="rounded-2xl shadow-lg w-full max-w-md"
+            src="https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=300&h=250&fit=crop"
+            alt="Natural remedies"
+            class="rounded-xl shadow-md w-full h-48 object-cover"
           />
-          <div class="absolute -bottom-4 -right-4 w-32 h-32 bg-primary-100 rounded-full -z-10"></div>
+          <img
+            src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&h=200&fit=crop"
+            alt="Homeopathic medicine"
+            class="rounded-xl shadow-md w-full h-36 object-cover"
+          />
+        </div>
+        <div class="space-y-4 pt-8">
+          <img
+            src="https://images.unsplash.com/photo-1587854692152-cbe660dbde88?w=300&h=200&fit=crop"
+            alt="Natural healing"
+            class="rounded-xl shadow-md w-full h-36 object-cover"
+          />
+          <img
+            src="https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=300&h=250&fit=crop"
+            alt="Holistic treatment"
+            class="rounded-xl shadow-md w-full h-48 object-cover"
+          />
         </div>
       </div>
 
@@ -259,14 +307,84 @@
               <p class="text-sm text-gray-600">Addresses underlying issues, not just symptoms</p>
             </div>
           </div>
+
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-hand-holding-heart text-primary-600"></i>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900">Personalized Care</h4>
+              <p class="text-sm text-gray-600">Treatment tailored to your unique constitution</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Testimonials Preview -->
+<!-- Success Stories - Before/After -->
 <section class="section-alt">
+  <div class="container-custom">
+    <div class="text-center mb-12">
+      <h2 class="section-title">Success Stories Across the Horizon</h2>
+      <p class="section-subtitle">
+        Real results from real patients — witness the transformative power of homeopathy
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      {#each successStories as story}
+        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+          <!-- Before/After Images -->
+          <div class="grid grid-cols-2">
+            <div class="relative">
+              <img
+                src={story.beforeImg}
+                alt="Before treatment"
+                class="w-full h-48 object-cover"
+              />
+              <span class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                BEFORE
+              </span>
+            </div>
+            <div class="relative">
+              <img
+                src={story.afterImg}
+                alt="After treatment"
+                class="w-full h-48 object-cover"
+              />
+              <span class="absolute top-3 right-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                AFTER
+              </span>
+            </div>
+          </div>
+
+          <!-- Details -->
+          <div class="p-5">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-gray-900">{story.condition}</h3>
+              <span class="text-sm text-primary-600 font-medium">
+                <i class="fas fa-clock mr-1"></i>{story.duration}
+              </span>
+            </div>
+            <p class="text-gray-600 text-sm">{story.description}</p>
+          </div>
+        </div>
+      {/each}
+    </div>
+
+    <div class="text-center mt-10">
+      <p class="text-gray-500 text-sm">
+        <i class="fas fa-shield-alt mr-1"></i>
+        All images shared with patient consent
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Preview -->
+<section class="section">
   <div class="container-custom">
     <div class="text-center mb-12">
       <h2 class="section-title">What Our Patients Say</h2>
