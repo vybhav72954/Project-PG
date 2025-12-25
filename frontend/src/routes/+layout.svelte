@@ -136,6 +136,7 @@
             <li><a href="/about" class="hover:text-primary-300 transition-colors">About Dr. Aditi</a></li>
             <li><a href="/testimonials" class="hover:text-primary-300 transition-colors">Testimonials</a></li>
             <li><a href="/blog" class="hover:text-primary-300 transition-colors">Research and Blogs</a></li>
+            <li><a href="/terms" class="hover:text-primary-300 transition-colors">Privacy & Terms</a></li>
           </ul>
         </div>
 
