@@ -33,16 +33,19 @@ func (h *AdminHandlers) AdminAuthMiddleware(next http.Handler) http.Handler {
 		// Check for admin token in header
 		token := r.Header.Get("X-Admin-Token")
 
-		// Simple token-based auth - token should match admin password hash or be the password itself
-		// In production, use proper JWT tokens
 		expectedToken := h.config.App.AdminPassword
 
+		// SECURITY: Require admin password to be set
 		if expectedToken == "" {
-			// If no admin password set, use default for development
-			expectedToken = "admin123"
+			log.Println("ERROR: ADMIN_PASSWORD environment variable is not set!")
+			respondJSON(w, http.StatusInternalServerError, models.APIResponse{
+				Success: false,
+				Error:   "Admin authentication not configured",
+			})
+			return
 		}
 
-		if token != expectedToken {
+		if token == "" || token != expectedToken {
 			respondJSON(w, http.StatusUnauthorized, models.APIResponse{
 				Success: false,
 				Error:   "Unauthorized - invalid or missing admin token",
@@ -66,19 +69,29 @@ func (h *AdminHandlers) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	expectedPassword := h.config.App.AdminPassword
-	if expectedPassword == "" {
-		expectedPassword = "admin123" // Default for development
-	}
 
-	if req.Password != expectedPassword {
-		respondJSON(w, http.StatusUnauthorized, models.APIResponse{
+	// SECURITY: Require admin password to be set
+	if expectedPassword == "" {
+		log.Println("ERROR: ADMIN_PASSWORD environment variable is not set!")
+		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
-			Error:   "Invalid password",
+			Error:   "Admin authentication not configured",
 		})
 		return
 	}
 
-	// Return the password as token (simple auth - use JWT in production)
+	// SECURITY: Don't reveal whether password is wrong vs user doesn't exist
+	if req.Password != expectedPassword {
+		// Add small delay to prevent timing attacks
+		time.Sleep(500 * time.Millisecond)
+		respondJSON(w, http.StatusUnauthorized, models.APIResponse{
+			Success: false,
+			Error:   "Invalid credentials",
+		})
+		return
+	}
+
+	// Return the password as token (for simplicity - use JWT in production)
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data: map[string]string{
