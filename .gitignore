@@ -1,38 +1,42 @@
+# ============================================================
+# GO BACKEND
+# ============================================================
 
-# Binaries for programs and plugins
+# Go binaries and executables
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
 
-# Test binary, built with `go test -c`
+# Go test binaries
 *.test
 
-# Output of the go coverage tool, specifically when used with LiteIDE
+# Go coverage output
 *.out
+coverage/
+*.cover
+.coverage
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
-
-# Go workspace file
+# Go workspace files
 go.work
 go.work.sum
 
-# env file
-backend_old/.env
-backend_old/credentials.json
-folder_structure
-*.log
-log
+# Go build directories
+backend/bin/
+backend/build/
+backend/tmp/
 
-backend_old/.env
+# ============================================================
+# DATABASES (SQLite)
+# ============================================================
 
-.idea
-
-backend/.env
-backend/credentials.json
-
+# SQLite database files
 *.db
 *.sqlite
 *.sqlite3
@@ -40,75 +44,199 @@ backend/credentials.json
 *.db-shm
 *.db-wal
 
+# Backend data directory databases
+backend/data/*.db
+backend/data/*.db-journal
+backend/data/*.db-shm
+backend/data/*.db-wal
 
-# OS files
-.DS_Store
-Thumbs.db
+# ============================================================
+# ENVIRONMENT & SECRETS
+# ============================================================
 
-backend/*.exe
-backend/*.exe~
-backend/*.dll
-backend/*.so
-backend/*.dylib
-backend/bin/
-backend/build/
-backend/tmp/
+# Environment files
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.*
+backend_old/.env
 
+# Credentials and API keys
+credentials.json
+backend/credentials.json
+backend_old/credentials.json
+*.pem
+*.key
+*.crt
 
-go.work
-go.work.sum
+# ============================================================
+# FRONTEND (SvelteKit/Node.js)
+# ============================================================
 
 # Dependencies
 node_modules/
 frontend/node_modules/
+.pnp
+.pnp.js
 
-# Build outputs
+# SvelteKit build outputs
 .svelte-kit/
+frontend/.svelte-kit/
+
+# Build directories
 build/
 dist/
 .output/
-frontend/.svelte-kit/
 frontend/build/
 frontend/dist/
 
-# Cache
+# Cache directories
 .vite/
 .turbo/
+.next/
+.nuxt/
 *.tsbuildinfo
 
+# Package manager locks (keep these commented - you usually WANT to commit these)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ============================================================
+# LOGS
+# ============================================================
+
+# Application logs
 *.log
 logs/
+log/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
+# ============================================================
+# IDE & EDITORS
+# ============================================================
+
+# VSCode
 .vscode/
+*.code-workspace
+
+# JetBrains IDEs (IntelliJ, GoLand, WebStorm)
 .idea/
+*.iml
+*.iws
+*.ipr
+
+# Vim
 *.swp
 *.swo
 *~
+
+# Eclipse
 .project
 .classpath
 .settings/
+
+# Sublime Text
 *.sublime-workspace
 *.sublime-project
 
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================
+# OPERATING SYSTEMS
+# ============================================================
+
+# macOS
 .DS_Store
 .DS_Store?
 ._*
+.AppleDouble
+.LSOverride
 .Spotlight-V100
 .Trashes
-ehthumbs.db
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
 desktop.ini
+$RECYCLE.BIN/
+*.lnk
 
-coverage/
-*.cover
-.coverage
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ============================================================
+# TESTING
+# ============================================================
+
+# Test coverage
 .pytest_cache/
+.coverage
+htmlcov/
+.nyc_output/
 
+# ============================================================
+# TEMPORARY & BACKUP FILES
+# ============================================================
+
+# Temporary files
 *.bak
 *.tmp
 *.temp
 .temp/
+temp/
+
+# Backup files
+*.backup
+*.old
+*-old
+*_backup
+
+# ============================================================
+# PROJECT SPECIFIC
+# ============================================================
+
+# Old backend directory
+backend_old/
+
+# Documentation artifacts
+# folder_structure.md
+
+# ============================================================
+# MISC
+# ============================================================
+
+# Compiled source
+*.com
+*.class
+*.o
+*.pyc
+
+# Archives (uncommit if you need to track these)
+*.zip
+*.tar.gz
+*.rar
+
+# Large media files (uncomment if needed)
+# *.mp4
+# *.mov
+# *.avi
+# *.pdf
+# *.psd
