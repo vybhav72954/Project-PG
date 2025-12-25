@@ -5,6 +5,7 @@ import (
 	"dr-aditi-backend/internal/db"
 	"dr-aditi-backend/internal/models"
 	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
@@ -31,16 +32,16 @@ func (h *AdminHandlers) AdminAuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Check for admin token in header
 		token := r.Header.Get("X-Admin-Token")
-		
+
 		// Simple token-based auth - token should match admin password hash or be the password itself
 		// In production, use proper JWT tokens
 		expectedToken := h.config.App.AdminPassword
-		
+
 		if expectedToken == "" {
 			// If no admin password set, use default for development
 			expectedToken = "admin123"
 		}
-		
+
 		if token != expectedToken {
 			respondJSON(w, http.StatusUnauthorized, models.APIResponse{
 				Success: false,
@@ -48,7 +49,7 @@ func (h *AdminHandlers) AdminAuthMiddleware(next http.Handler) http.Handler {
 			})
 			return
 		}
-		
+
 		next.ServeHTTP(w, r)
 	})
 }
@@ -63,12 +64,12 @@ func (h *AdminHandlers) Login(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	expectedPassword := h.config.App.AdminPassword
 	if expectedPassword == "" {
 		expectedPassword = "admin123" // Default for development
 	}
-	
+
 	if req.Password != expectedPassword {
 		respondJSON(w, http.StatusUnauthorized, models.APIResponse{
 			Success: false,
@@ -76,7 +77,7 @@ func (h *AdminHandlers) Login(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	// Return the password as token (simple auth - use JWT in production)
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
@@ -97,7 +98,7 @@ func (h *AdminHandlers) GetDashboard(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data:    stats,
@@ -109,10 +110,10 @@ func (h *AdminHandlers) GetAppointments(w http.ResponseWriter, r *http.Request) 
 	status := r.URL.Query().Get("status")
 	startDateStr := r.URL.Query().Get("start_date")
 	endDateStr := r.URL.Query().Get("end_date")
-	
+
 	var startDate, endDate time.Time
 	var err error
-	
+
 	if startDateStr != "" {
 		startDate, err = time.Parse("2006-01-02", startDateStr)
 		if err != nil {
@@ -123,7 +124,7 @@ func (h *AdminHandlers) GetAppointments(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 	}
-	
+
 	if endDateStr != "" {
 		endDate, err = time.Parse("2006-01-02", endDateStr)
 		if err != nil {
@@ -136,7 +137,7 @@ func (h *AdminHandlers) GetAppointments(w http.ResponseWriter, r *http.Request) 
 		// Include the full end date
 		endDate = endDate.Add(24 * time.Hour)
 	}
-	
+
 	appointments, err := h.db.GetAllAppointments(status, startDate, endDate)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
@@ -145,11 +146,11 @@ func (h *AdminHandlers) GetAppointments(w http.ResponseWriter, r *http.Request) 
 		})
 		return
 	}
-	
+
 	if appointments == nil {
 		appointments = []models.Appointment{}
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data:    appointments,
@@ -159,7 +160,7 @@ func (h *AdminHandlers) GetAppointments(w http.ResponseWriter, r *http.Request) 
 // UpdateAppointmentStatus updates the status of an appointment
 func (h *AdminHandlers) UpdateAppointmentStatus(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	
+
 	var req models.UpdateStatusRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondJSON(w, http.StatusBadRequest, models.APIResponse{
@@ -168,14 +169,14 @@ func (h *AdminHandlers) UpdateAppointmentStatus(w http.ResponseWriter, r *http.R
 		})
 		return
 	}
-	
+
 	// Validate status
 	validStatuses := map[string]bool{
 		"confirmed": true,
 		"cancelled": true,
 		"completed": true,
 	}
-	
+
 	if !validStatuses[req.Status] {
 		respondJSON(w, http.StatusBadRequest, models.APIResponse{
 			Success: false,
@@ -183,7 +184,7 @@ func (h *AdminHandlers) UpdateAppointmentStatus(w http.ResponseWriter, r *http.R
 		})
 		return
 	}
-	
+
 	if err := h.db.UpdateAppointmentStatus(id, req.Status); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -191,7 +192,7 @@ func (h *AdminHandlers) UpdateAppointmentStatus(w http.ResponseWriter, r *http.R
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Message: "Appointment status updated",
@@ -202,17 +203,18 @@ func (h *AdminHandlers) UpdateAppointmentStatus(w http.ResponseWriter, r *http.R
 func (h *AdminHandlers) GetPatients(w http.ResponseWriter, r *http.Request) {
 	patients, err := h.db.GetAllPatients()
 	if err != nil {
+		log.Printf("Error fetching patients: %v", err)
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
 			Error:   "Failed to fetch patients",
 		})
 		return
 	}
-	
+
 	if patients == nil {
 		patients = []models.PatientSummary{}
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data:    patients,
@@ -229,7 +231,7 @@ func (h *AdminHandlers) GetPatientHistory(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	appointments, err := h.db.GetPatientAppointments(email)
 	if err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
@@ -238,11 +240,11 @@ func (h *AdminHandlers) GetPatientHistory(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	if appointments == nil {
 		appointments = []models.Appointment{}
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data:    appointments,
@@ -259,11 +261,11 @@ func (h *AdminHandlers) GetTestimonials(w http.ResponseWriter, r *http.Request) 
 		})
 		return
 	}
-	
+
 	if testimonials == nil {
 		testimonials = []models.Testimonial{}
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data:    testimonials,
@@ -280,7 +282,7 @@ func (h *AdminHandlers) CreateTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	if req.Name == "" || req.Review == "" || req.Rating < 1 || req.Rating > 5 {
 		respondJSON(w, http.StatusBadRequest, models.APIResponse{
 			Success: false,
@@ -288,7 +290,7 @@ func (h *AdminHandlers) CreateTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	testimonial := &models.Testimonial{
 		ID:        uuid.New().String(),
 		Name:      req.Name,
@@ -297,7 +299,7 @@ func (h *AdminHandlers) CreateTestimonial(w http.ResponseWriter, r *http.Request
 		Condition: req.Condition,
 		IsActive:  true,
 	}
-	
+
 	if err := h.db.CreateTestimonial(testimonial); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -305,7 +307,7 @@ func (h *AdminHandlers) CreateTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusCreated, models.APIResponse{
 		Success: true,
 		Data:    testimonial,
@@ -316,7 +318,7 @@ func (h *AdminHandlers) CreateTestimonial(w http.ResponseWriter, r *http.Request
 // UpdateTestimonial updates a testimonial
 func (h *AdminHandlers) UpdateTestimonial(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	
+
 	var req models.TestimonialRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondJSON(w, http.StatusBadRequest, models.APIResponse{
@@ -325,7 +327,7 @@ func (h *AdminHandlers) UpdateTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	testimonial := &models.Testimonial{
 		ID:        id,
 		Name:      req.Name,
@@ -334,7 +336,7 @@ func (h *AdminHandlers) UpdateTestimonial(w http.ResponseWriter, r *http.Request
 		Condition: req.Condition,
 		IsActive:  req.IsActive,
 	}
-	
+
 	if err := h.db.UpdateTestimonial(testimonial); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -342,7 +344,7 @@ func (h *AdminHandlers) UpdateTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Message: "Testimonial updated",
@@ -352,7 +354,7 @@ func (h *AdminHandlers) UpdateTestimonial(w http.ResponseWriter, r *http.Request
 // DeleteTestimonial deletes a testimonial
 func (h *AdminHandlers) DeleteTestimonial(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	
+
 	if err := h.db.DeleteTestimonial(id); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -360,7 +362,7 @@ func (h *AdminHandlers) DeleteTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Message: "Testimonial deleted",
@@ -370,7 +372,7 @@ func (h *AdminHandlers) DeleteTestimonial(w http.ResponseWriter, r *http.Request
 // ToggleTestimonial toggles the active status of a testimonial
 func (h *AdminHandlers) ToggleTestimonial(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	
+
 	if err := h.db.ToggleTestimonialActive(id); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -378,7 +380,7 @@ func (h *AdminHandlers) ToggleTestimonial(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Message: "Testimonial toggled",
@@ -395,11 +397,11 @@ func (h *AdminHandlers) GetBlockedDates(w http.ResponseWriter, r *http.Request) 
 		})
 		return
 	}
-	
+
 	if dates == nil {
 		dates = []models.BlockedDate{}
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Data:    dates,
@@ -416,7 +418,7 @@ func (h *AdminHandlers) AddBlockedDate(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	if req.Date == "" {
 		respondJSON(w, http.StatusBadRequest, models.APIResponse{
 			Success: false,
@@ -424,7 +426,7 @@ func (h *AdminHandlers) AddBlockedDate(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	// Validate date format
 	_, err := time.Parse("2006-01-02", req.Date)
 	if err != nil {
@@ -434,13 +436,13 @@ func (h *AdminHandlers) AddBlockedDate(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	blockedDate := &models.BlockedDate{
 		ID:     uuid.New().String(),
 		Date:   req.Date,
 		Reason: req.Reason,
 	}
-	
+
 	if err := h.db.AddBlockedDate(blockedDate); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -448,7 +450,7 @@ func (h *AdminHandlers) AddBlockedDate(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusCreated, models.APIResponse{
 		Success: true,
 		Data:    blockedDate,
@@ -459,7 +461,7 @@ func (h *AdminHandlers) AddBlockedDate(w http.ResponseWriter, r *http.Request) {
 // RemoveBlockedDate removes a blocked date
 func (h *AdminHandlers) RemoveBlockedDate(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	
+
 	if err := h.db.RemoveBlockedDate(id); err != nil {
 		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
 			Success: false,
@@ -467,7 +469,7 @@ func (h *AdminHandlers) RemoveBlockedDate(w http.ResponseWriter, r *http.Request
 		})
 		return
 	}
-	
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Message: "Blocked date removed",

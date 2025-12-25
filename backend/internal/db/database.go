@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -488,20 +489,64 @@ func (db *Database) GetAllPatients() ([]models.PatientSummary, error) {
 		ORDER BY last_appointment DESC
 	`)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query error: %w", err)
 	}
 	defer rows.Close()
+
+	// Common datetime formats used by SQLite/Go
+	dateFormats := []string{
+		"2006-01-02 15:04:05 -0700 MST",           // Go default: 2025-12-30 10:00:00 +0530 IST
+		"2006-01-02 15:04:05.999999999 -0700 MST", // With nanoseconds
+		time.RFC3339,
+		time.RFC3339Nano,
+		"2006-01-02T15:04:05Z",
+		"2006-01-02T15:04:05",
+		"2006-01-02 15:04:05Z",
+		"2006-01-02 15:04:05",
+		"2006-01-02T15:04:05+05:30",
+		"2006-01-02T15:04:05-07:00",
+		"2006-01-02 15:04:05+05:30",
+		"2006-01-02 15:04:05-07:00",
+	}
+
+	parseTime := func(s string) time.Time {
+		// Strip monotonic clock reading if present (e.g., " m=+692.333939201")
+		if idx := strings.Index(s, " m="); idx != -1 {
+			s = s[:idx]
+		}
+
+		for _, format := range dateFormats {
+			if t, err := time.Parse(format, s); err == nil {
+				return t
+			}
+		}
+		return time.Time{}
+	}
 
 	var patients []models.PatientSummary
 	for rows.Next() {
 		var p models.PatientSummary
-		if err := rows.Scan(&p.Email, &p.Name, &p.Phone, &p.AppointmentCount, &p.LastAppointment, &p.FirstVisit); err != nil {
-			return nil, err
+		var lastAppt, firstVisit sql.NullString
+		if err := rows.Scan(&p.Email, &p.Name, &p.Phone, &p.AppointmentCount, &lastAppt, &firstVisit); err != nil {
+			return nil, fmt.Errorf("scan error: %w", err)
 		}
+
+		if lastAppt.Valid && lastAppt.String != "" {
+			p.LastAppointment = parseTime(lastAppt.String)
+		}
+
+		if firstVisit.Valid && firstVisit.String != "" {
+			p.FirstVisit = parseTime(firstVisit.String)
+		}
+
 		patients = append(patients, p)
 	}
 
-	return patients, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows error: %w", err)
+	}
+
+	return patients, nil
 }
 
 // GetPatientAppointments returns all appointments for a patient by email
