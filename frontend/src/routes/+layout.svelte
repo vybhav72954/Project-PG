@@ -11,6 +11,7 @@
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/testimonials', label: 'Testimonials' },
+    { href: '/blog', label: 'Research & Blogs' },
     { href: '/appointment', label: 'Book Appointment' }
   ];
 
@@ -134,7 +135,7 @@
             <li><a href="/" class="hover:text-primary-300 transition-colors">Home</a></li>
             <li><a href="/about" class="hover:text-primary-300 transition-colors">About Dr. Aditi</a></li>
             <li><a href="/testimonials" class="hover:text-primary-300 transition-colors">Testimonials</a></li>
-            <li><a href="/appointment" class="hover:text-primary-300 transition-colors">Book Appointment</a></li>
+            <li><a href="/blog" class="hover:text-primary-300 transition-colors">Research and Blogs</a></li>
           </ul>
         </div>
 
