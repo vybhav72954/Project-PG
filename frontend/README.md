@@ -1,38 +1,46 @@
-# sv
+# Friends2Health Frontend
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.0-FF3E00)](https://kit.svelte.dev/)
+[![Tailwind](https://img.shields.io/badge/Tailwind-3.4-38B2AC)](https://tailwindcss.com/)
 
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Commands
 
 ```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+npm install         # install dependencies
+npm run dev         # development server at localhost:5173
+npm run build       # production build
+npm run preview     # preview production build
 ```
 
-## Building
+## Configuration
 
-To create a production version of your app:
+Site-wide settings are in `src/lib/config.ts`:
+
+```typescript
+export const siteConfig = {
+  clinicName: 'Friends2health Homoeo Clinic',
+  doctor: {
+    name: 'Dr. Aditi Singh',
+    title: 'BHMS, MD (Hom)',
+  },
+  contact: {
+    phone: '+91-9988776655',
+    whatsapp: '919988776655',
+    email: 'contact@example.com',
+  },
+  // ...
+};
+```
+
+## Admin Panel
+
+Located at `/admin`. Requires password set in backend `ADMIN_PASSWORD` env var.
+
+Auto-logout after 15 minutes of inactivity.
 
 ```bash
 npm run build
+# deploy the 'build' directory
 ```
 
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+For static hosting, switch to `@sveltejs/adapter-static` in `svelte.config.js`.
