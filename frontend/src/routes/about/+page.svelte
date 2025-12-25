@@ -1,13 +1,51 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { siteConfig } from '$lib/config';
+
+  const { doctor, contact } = siteConfig;
+
+  // Doctor image carousel
+  let currentDoctorImage = 0;
+  const doctorImages = [
+    {
+      src: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop&crop=top',
+      alt: 'Dr. Aditi Singh - Consultation'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=500&fit=crop&crop=top',
+      alt: 'Dr. Aditi Singh - With Patient'
+    },
+    {
+      src: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=400&h=500&fit=crop&crop=top',
+      alt: 'Dr. Aditi Singh - Clinic'
+    }
+  ];
+
+  // Auto-rotate doctor images
+  onMount(() => {
+    const interval = setInterval(() => {
+      currentDoctorImage = (currentDoctorImage + 1) % doctorImages.length;
+    }, 4000);
+    return () => clearInterval(interval);
+  });
+
+  function nextDoctorImage() {
+    currentDoctorImage = (currentDoctorImage + 1) % doctorImages.length;
+  }
+
+  function prevDoctorImage() {
+    currentDoctorImage = (currentDoctorImage - 1 + doctorImages.length) % doctorImages.length;
+  }
+
   const qualifications = [
     {
       degree: 'BHMS',
-      institution: 'Homoeopathic Medical College & Hospital, Chandigarh',
+      institution: doctor.bhmsCollege,
       description: 'Bachelor of Homeopathic Medicine and Surgery - comprehensive training in homeopathic principles, materia medica, and clinical practice.'
     },
     {
       degree: 'MD (Homoeopathy)',
-      institution: 'National Institute of Homoeopathy, New Delhi',
+      institution: doctor.mdCollege,
       description: 'Advanced specialization in homeopathic medicine with focus on chronic diseases and constitutional treatment.'
     }
   ];
@@ -48,47 +86,82 @@
 </script>
 
 <svelte:head>
-  <title>About Dr. Aditi Singh | Friends2health Homoeo Clinic</title>
+  <title>About {doctor.name} | {siteConfig.clinicName}</title>
 </svelte:head>
 
-<!-- Hero Section -->
+<!-- Hero Section with Carousel -->
 <section class="bg-gradient-hero py-16">
   <div class="container-custom">
     <div class="grid lg:grid-cols-2 gap-12 items-center">
-      <!-- Image -->
+      <!-- Image Carousel -->
       <div class="flex justify-center order-2 lg:order-1">
         <div class="relative">
-          <div class="w-80 h-96 bg-gradient-green rounded-2xl flex items-center justify-center">
-            <div class="text-center">
-              <div class="w-40 h-40 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-                <i class="fas fa-user-doctor text-6xl text-primary-500"></i>
-              </div>
-              <p class="text-primary-700 font-bold text-xl">Dr. Aditi Singh</p>
-              <p class="text-primary-600">BHMS, MD (Hom)</p>
+          <div class="w-80 h-96 bg-gradient-green rounded-2xl overflow-hidden shadow-xl relative">
+            <!-- Images -->
+            {#each doctorImages as image, i}
+              <img
+                src={image.src}
+                alt={image.alt}
+                class="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 {i === currentDoctorImage ? 'opacity-100' : 'opacity-0'}"
+              />
+            {/each}
+
+            <!-- Overlay with name -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
+              <p class="text-white font-bold text-xl">{doctor.name}</p>
+              <p class="text-white/80 text-sm">{doctor.title}</p>
+            </div>
+
+            <!-- Navigation arrows -->
+            <button
+              on:click={prevDoctorImage}
+              class="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+              aria-label="Previous image"
+            >
+              <i class="fas fa-chevron-left text-gray-700"></i>
+            </button>
+            <button
+              on:click={nextDoctorImage}
+              class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-colors"
+              aria-label="Next image"
+            >
+              <i class="fas fa-chevron-right text-gray-700"></i>
+            </button>
+
+            <!-- Dots indicator -->
+            <div class="absolute bottom-20 left-1/2 -translate-x-1/2 flex gap-2">
+              {#each doctorImages as _, i}
+                <button
+                  on:click={() => currentDoctorImage = i}
+                  class="w-2 h-2 rounded-full transition-colors {i === currentDoctorImage ? 'bg-white' : 'bg-white/50'}"
+                  aria-label="Go to image {i + 1}"
+                ></button>
+              {/each}
             </div>
           </div>
+
           <!-- Decorative elements -->
           <div class="absolute -top-4 -left-4 w-20 h-20 bg-cta/20 rounded-full"></div>
           <div class="absolute -bottom-4 -right-4 w-16 h-16 bg-primary-300/40 rounded-full"></div>
         </div>
       </div>
-      
+
       <!-- Content -->
       <div class="order-1 lg:order-2">
         <span class="badge mb-4">About the Doctor</span>
         <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-          Dr. Aditi Singh
+          {doctor.name}
         </h1>
         <p class="text-xl text-primary-600 mb-6">
-          Homeopathic Physician | 3+ Years Experience
+          Homeopathic Physician | {doctor.experience} Years Experience
         </p>
         <p class="text-gray-600 mb-6">
-          Dr. Aditi Singh is a passionate and dedicated homeopathic physician committed to providing 
-          natural, gentle, and effective healthcare solutions. With her patient-centric approach, 
+          {doctor.name} is a passionate and dedicated homeopathic physician committed to providing
+          natural, gentle, and effective healthcare solutions. With her patient-centric approach,
           she believes in treating the person as a whole, not just the disease.
         </p>
         <p class="text-gray-600 mb-8">
-          Her journey in homeopathy began with a deep belief in the body's innate healing ability 
+          Her journey in homeopathy began with a deep belief in the body's innate healing ability
           and the power of natural remedies to restore health without side effects.
         </p>
         <a href="/appointment" class="btn-primary">
@@ -107,7 +180,7 @@
       <h2 class="section-title">Education & Qualifications</h2>
       <p class="section-subtitle">Trained at India's premier homeopathic institutions</p>
     </div>
-    
+
     <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
       {#each qualifications as qual}
         <div class="card-hover p-8">
@@ -134,7 +207,7 @@
       <h2 class="section-title">Treatment Approach</h2>
       <p class="section-subtitle">A systematic approach to holistic healing</p>
     </div>
-    
+
     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
       {#each approach as item, index}
         <div class="bg-white p-6 rounded-xl shadow-sm text-center">
@@ -161,8 +234,8 @@
       <div>
         <h2 class="section-title">Areas of Expertise</h2>
         <p class="text-gray-600 mb-8">
-          Dr. Aditi specializes in treating a wide range of acute and chronic conditions using 
-          classical homeopathic principles. Her expertise spans across various health domains, 
+          {doctor.name} specializes in treating a wide range of acute and chronic conditions using
+          classical homeopathic principles. Her expertise spans across various health domains,
           with a particular focus on conditions that have limited success with conventional treatment.
         </p>
         <div class="grid grid-cols-2 gap-4">
@@ -174,7 +247,7 @@
           {/each}
         </div>
       </div>
-      
+
       <div class="bg-primary-50 rounded-2xl p-8">
         <h3 class="text-xl font-bold text-gray-900 mb-4">Why Choose Homeopathy?</h3>
         <ul class="space-y-4">
@@ -219,14 +292,14 @@
       Start Your Healing Journey Today
     </h2>
     <p class="text-primary-100 mb-8 max-w-xl mx-auto">
-      Book a consultation with Dr. Aditi Singh and experience the gentle power of homeopathy.
+      Book a consultation with {doctor.name} and experience the gentle power of homeopathy.
     </p>
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
       <a href="/appointment" class="inline-flex items-center justify-center rounded-md bg-cta px-8 py-4 font-semibold text-gray-900 hover:bg-cta-hover transition-all">
         <i class="fas fa-calendar-plus mr-2"></i>
         Book Appointment
       </a>
-      <a href="https://wa.me/919877505344" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-md bg-white/10 border-2 border-white px-8 py-4 font-semibold text-white hover:bg-white/20 transition-all">
+      <a href="https://wa.me/{contact.whatsapp}" target="_blank" rel="noopener" class="inline-flex items-center justify-center rounded-md bg-white/10 border-2 border-white px-8 py-4 font-semibold text-white hover:bg-white/20 transition-all">
         <i class="fab fa-whatsapp mr-2"></i>
         WhatsApp Us
       </a>
