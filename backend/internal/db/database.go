@@ -64,6 +64,8 @@ func (db *Database) initialize() error {
 		amount INTEGER NOT NULL,
 		meet_link TEXT,
 		calendar_event_id TEXT,
+		reminder_24h_sent INTEGER DEFAULT 0,
+		reminder_1h_sent INTEGER DEFAULT 0,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		FOREIGN KEY (patient_id) REFERENCES patients(id)
@@ -103,6 +105,10 @@ func (db *Database) initialize() error {
 	if err != nil {
 		return fmt.Errorf("executing schema: %w", err)
 	}
+
+	// Migration: Add reminder columns if they don't exist (for existing databases)
+	db.conn.Exec(`ALTER TABLE appointments ADD COLUMN reminder_24h_sent INTEGER DEFAULT 0`)
+	db.conn.Exec(`ALTER TABLE appointments ADD COLUMN reminder_1h_sent INTEGER DEFAULT 0`)
 
 	// Insert default testimonials if none exist
 	var count int
@@ -477,29 +483,21 @@ func (db *Database) GetAllPatients() ([]models.PatientSummary, error) {
 			MAX(start_time) as last_appointment,
 			MIN(created_at) as first_visit
 		FROM appointments
-		WHERE status != 'cancelled'
+		WHERE status = 'confirmed'
 		GROUP BY patient_email
 		ORDER BY last_appointment DESC
 	`)
 	if err != nil {
-		return nil, fmt.Errorf("query error: %w", err)
+		return nil, err
 	}
 	defer rows.Close()
 
 	var patients []models.PatientSummary
 	for rows.Next() {
 		var p models.PatientSummary
-		var lastAppt, firstVisit string
-
-		// Scan timestamps as strings first
-		if err := rows.Scan(&p.Email, &p.Name, &p.Phone, &p.AppointmentCount, &lastAppt, &firstVisit); err != nil {
-			return nil, fmt.Errorf("scan error: %w", err)
+		if err := rows.Scan(&p.Email, &p.Name, &p.Phone, &p.AppointmentCount, &p.LastAppointment, &p.FirstVisit); err != nil {
+			return nil, err
 		}
-
-		// Parse the string timestamps into time.Time
-		p.LastAppointment, _ = time.Parse("2006-01-02 15:04:05", lastAppt)
-		p.FirstVisit, _ = time.Parse("2006-01-02 15:04:05", firstVisit)
-
 		patients = append(patients, p)
 	}
 
@@ -668,4 +666,93 @@ func (db *Database) SetSetting(key, value string) error {
 		ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = ?
 	`, key, value, time.Now(), value, time.Now())
 	return err
+}
+
+// GetAppointmentsNeedingReminder24h returns confirmed appointments that:
+// - Start between 23-25 hours from now (to catch appointments in that window)
+// - Haven't had 24h reminder sent yet
+func (db *Database) GetAppointmentsNeedingReminder24h() ([]models.Appointment, error) {
+	now := time.Now()
+	windowStart := now.Add(23 * time.Hour)
+	windowEnd := now.Add(25 * time.Hour)
+
+	rows, err := db.conn.Query(`
+		SELECT id, patient_id, patient_name, patient_email, patient_phone,
+			consultation_type, start_time, end_time, status, payment_status,
+			COALESCE(payment_id, ''), COALESCE(payment_order_id, ''), amount,
+			COALESCE(meet_link, ''), COALESCE(calendar_event_id, ''),
+			created_at, updated_at
+		FROM appointments
+		WHERE status = 'confirmed'
+			AND start_time >= ? AND start_time <= ?
+			AND reminder_24h_sent = 0
+	`, windowStart, windowEnd)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return scanAppointments(rows)
+}
+
+// GetAppointmentsNeedingReminder1h returns confirmed appointments that:
+// - Start between 50 minutes to 70 minutes from now
+// - Haven't had 1h reminder sent yet
+func (db *Database) GetAppointmentsNeedingReminder1h() ([]models.Appointment, error) {
+	now := time.Now()
+	windowStart := now.Add(50 * time.Minute)
+	windowEnd := now.Add(70 * time.Minute)
+
+	rows, err := db.conn.Query(`
+		SELECT id, patient_id, patient_name, patient_email, patient_phone,
+			consultation_type, start_time, end_time, status, payment_status,
+			COALESCE(payment_id, ''), COALESCE(payment_order_id, ''), amount,
+			COALESCE(meet_link, ''), COALESCE(calendar_event_id, ''),
+			created_at, updated_at
+		FROM appointments
+		WHERE status = 'confirmed'
+			AND start_time >= ? AND start_time <= ?
+			AND reminder_1h_sent = 0
+	`, windowStart, windowEnd)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	return scanAppointments(rows)
+}
+
+// MarkReminder24hSent marks the 24h reminder as sent for an appointment
+func (db *Database) MarkReminder24hSent(appointmentID string) error {
+	_, err := db.conn.Exec(`
+		UPDATE appointments SET reminder_24h_sent = 1, updated_at = ? WHERE id = ?
+	`, time.Now(), appointmentID)
+	return err
+}
+
+// MarkReminder1hSent marks the 1h reminder as sent for an appointment
+func (db *Database) MarkReminder1hSent(appointmentID string) error {
+	_, err := db.conn.Exec(`
+		UPDATE appointments SET reminder_1h_sent = 1, updated_at = ? WHERE id = ?
+	`, time.Now(), appointmentID)
+	return err
+}
+
+// scanAppointments is a helper to scan appointment rows
+func scanAppointments(rows *sql.Rows) ([]models.Appointment, error) {
+	var appointments []models.Appointment
+	for rows.Next() {
+		var apt models.Appointment
+		if err := rows.Scan(
+			&apt.ID, &apt.PatientID, &apt.PatientName, &apt.PatientEmail, &apt.PatientPhone,
+			&apt.ConsultationType, &apt.StartTime, &apt.EndTime, &apt.Status, &apt.PaymentStatus,
+			&apt.PaymentID, &apt.PaymentOrderID, &apt.Amount,
+			&apt.MeetLink, &apt.CalendarEventID,
+			&apt.CreatedAt, &apt.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		appointments = append(appointments, apt)
+	}
+	return appointments, rows.Err()
 }

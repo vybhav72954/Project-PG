@@ -185,6 +185,105 @@ func (es *EmailService) SendAppointmentReminder(apt *models.Appointment) error {
 	return es.sendEmail(apt.PatientEmail, subject, body)
 }
 
+// SendAppointmentReminder24h sends a reminder email 24 hours before appointment
+func (es *EmailService) SendAppointmentReminder24h(apt *models.Appointment) error {
+	if es.config.SenderEmail == "" || es.config.Password == "" {
+		fmt.Println("Email service not configured, skipping 24h reminder")
+		return nil
+	}
+
+	consultationType := "Video Call"
+	if apt.ConsultationType == "voice" {
+		consultationType = "Voice Call"
+	}
+
+	subject := "Reminder: Your Appointment Tomorrow - " + es.appConfig.ClinicName
+
+	body := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #5F8575 0%%, #4d6e60 100%%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0; font-size: 24px;">📅 Appointment Tomorrow</h1>
+    </div>
+    
+    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <p style="font-size: 16px;">Dear <strong>%s</strong>,</p>
+        
+        <p>This is a friendly reminder that you have an appointment scheduled with <strong>%s</strong> tomorrow.</p>
+        
+        <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #5F8575;">
+            <h3 style="margin-top: 0; color: #5F8575;">Appointment Details</h3>
+            <table style="width: 100%%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding: 8px 0; color: #666;">📅 Date & Time:</td>
+                    <td style="padding: 8px 0; font-weight: bold;">%s</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px 0; color: #666;">📞 Consultation Type:</td>
+                    <td style="padding: 8px 0; font-weight: bold;">%s</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-weight: bold; color: #2e7d32;">Your Meeting Link</p>
+            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Meeting</a>
+            <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                Save this link - you'll need it tomorrow!
+            </p>
+        </div>
+        
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0; font-weight: bold; color: #e65100;">📌 Before Your Appointment:</p>
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #666;">
+                <li>Ensure stable internet connection</li>
+                <li>Find a quiet, well-lit space</li>
+                <li>Keep your medical history ready</li>
+                <li>Note down questions you want to ask</li>
+            </ul>
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <p style="font-size: 14px; color: #666;">
+            Need to reschedule? Contact us at least 12 hours before:<br>
+            📞 <a href="tel:%s" style="color: #5F8575;">%s</a><br>
+            💬 <a href="https://wa.me/%s" style="color: #25D366;">WhatsApp</a>
+        </p>
+        
+        <p style="margin-top: 30px;">
+            Looking forward to seeing you!<br>
+            <strong>%s</strong><br>
+            %s
+        </p>
+    </div>
+    
+    <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+        <p>© 2025 %s. All rights reserved.</p>
+    </div>
+</body>
+</html>
+`,
+		apt.PatientName,
+		es.appConfig.DoctorName,
+		apt.StartTime.Format("Monday, January 2, 2006 at 3:04 PM"),
+		consultationType,
+		apt.MeetLink,
+		es.appConfig.ClinicPhone, es.appConfig.ClinicPhone,
+		es.appConfig.ClinicWhatsApp,
+		es.appConfig.DoctorName,
+		es.appConfig.ClinicName,
+		es.appConfig.ClinicName,
+	)
+
+	return es.sendEmail(apt.PatientEmail, subject, body)
+}
+
 // sendEmail sends an email via SMTP
 func (es *EmailService) sendEmail(to, subject, body string) error {
 	auth := smtp.PlainAuth("", es.config.SenderEmail, es.config.Password, es.config.SMTPHost)
