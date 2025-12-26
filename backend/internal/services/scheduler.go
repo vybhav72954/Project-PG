@@ -25,8 +25,6 @@ func NewReminderScheduler(database *db.Database, emailService *EmailService) *Re
 // Start begins the reminder scheduler
 // It checks for appointments needing reminders every 10 minutes
 func (rs *ReminderScheduler) Start() {
-	log.Println("📧 Reminder scheduler started")
-
 	// Run immediately on start
 	rs.checkAndSendReminders()
 
@@ -39,7 +37,7 @@ func (rs *ReminderScheduler) Start() {
 				rs.checkAndSendReminders()
 			case <-rs.stopChan:
 				ticker.Stop()
-				log.Println("📧 Reminder scheduler stopped")
+				log.Println("Reminder scheduler stopped")
 				return
 			}
 		}
@@ -79,12 +77,12 @@ func (rs *ReminderScheduler) send24hReminders() {
 		if err != nil {
 			log.Printf("Error marking 24h reminder as sent for %s: %v", apt.ID, err)
 		} else {
-			log.Printf("✅ 24h reminder sent successfully to %s", apt.PatientEmail)
+			log.Printf("24h reminder sent to %s", apt.PatientEmail)
 		}
 	}
 
 	if len(appointments) > 0 {
-		log.Printf("📧 Processed %d 24-hour reminders", len(appointments))
+		log.Printf("Processed %d 24-hour reminders", len(appointments))
 	}
 }
 
@@ -110,11 +108,11 @@ func (rs *ReminderScheduler) send1hReminders() {
 		if err != nil {
 			log.Printf("Error marking 1h reminder as sent for %s: %v", apt.ID, err)
 		} else {
-			log.Printf("✅ 1h reminder sent successfully to %s", apt.PatientEmail)
+			log.Printf("1h reminder sent to %s", apt.PatientEmail)
 		}
 	}
 
 	if len(appointments) > 0 {
-		log.Printf("📧 Processed %d 1-hour reminders", len(appointments))
+		log.Printf("Processed %d 1-hour reminders", len(appointments))
 	}
 }

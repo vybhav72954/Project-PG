@@ -65,13 +65,39 @@ func main() {
 		}
 	}()
 
-	// Start server
-	serverAddr := fmt.Sprintf(":%s", cfg.Server.Port)
-	log.Printf("🏥 Dr. Aditi's Clinic Backend starting on %s", serverAddr)
-	log.Printf("   Environment: %s", cfg.Server.Environment)
-	log.Printf("   Frontend URL: %s", cfg.Server.FrontendURL)
+	// Print startup info
+	fmt.Println()
+	fmt.Printf("Server started on :%s\n", cfg.Server.Port)
+	fmt.Printf("  Environment: %s\n", cfg.Server.Environment)
+	fmt.Printf("  Frontend:    %s\n", cfg.Server.FrontendURL)
+	fmt.Printf("  Database:    %s\n", cfg.Database.Path)
 
-	if err := http.ListenAndServe(serverAddr, router); err != nil {
+	// Email status
+	if cfg.Email.SenderEmail != "" && cfg.Email.Password != "" {
+		fmt.Printf("  Email:       configured (%s)\n", cfg.Email.SMTPHost)
+	} else {
+		fmt.Printf("  Email:       not configured\n")
+	}
+
+	// Razorpay status
+	if paymentService.IsConfigured() {
+		fmt.Printf("  Razorpay:    configured\n")
+	} else {
+		fmt.Printf("  Razorpay:    not configured (test mode)\n")
+	}
+
+	// Calendar status
+	if cfg.Calendar.CalendarID != "" {
+		fmt.Printf("  Calendar:    configured\n")
+	} else {
+		fmt.Printf("  Calendar:    not configured (using Jitsi fallback)\n")
+	}
+
+	fmt.Printf("  Scheduler:   running\n")
+	fmt.Println()
+
+	// Start server
+	if err := http.ListenAndServe(fmt.Sprintf(":%s", cfg.Server.Port), router); err != nil {
 		log.Fatalf("Server failed: %v", err)
 	}
 }
