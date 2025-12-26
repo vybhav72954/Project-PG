@@ -25,10 +25,14 @@ func New(dbPath string) (*Database, error) {
 		return nil, fmt.Errorf("creating database directory: %w", err)
 	}
 
-	conn, err := sql.Open("sqlite", dbPath+"?_foreign_keys=on")
+	// _busy_timeout=10000 waits up to 10 seconds if database is locked
+	conn, err := sql.Open("sqlite", dbPath+"?_foreign_keys=on&_busy_timeout=10000")
 	if err != nil {
 		return nil, fmt.Errorf("opening database: %w", err)
 	}
+
+	// Limit connections to prevent lock contention
+	conn.SetMaxOpenConns(1)
 
 	db := &Database{conn: conn}
 	if err := db.initialize(); err != nil {
