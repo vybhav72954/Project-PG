@@ -4,6 +4,7 @@ import (
 	"dr-aditi-backend/internal/config"
 	"dr-aditi-backend/internal/db"
 	"dr-aditi-backend/internal/models"
+	"dr-aditi-backend/internal/services"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -17,13 +18,15 @@ import (
 type AdminHandlers struct {
 	db     *db.Database
 	config *config.Config
+	email  *services.EmailService
 }
 
 // NewAdminHandlers creates a new AdminHandlers instance
-func NewAdminHandlers(database *db.Database, cfg *config.Config) *AdminHandlers {
+func NewAdminHandlers(database *db.Database, cfg *config.Config, emailSvc *services.EmailService) *AdminHandlers {
 	return &AdminHandlers{
 		db:     database,
 		config: cfg,
+		email:  emailSvc,
 	}
 }
 
@@ -206,9 +209,48 @@ func (h *AdminHandlers) UpdateAppointmentStatus(w http.ResponseWriter, r *http.R
 		return
 	}
 
+	// Send completion email if status is completed
+	if req.Status == "completed" {
+		apt, err := h.db.GetAppointment(id)
+		if err == nil && apt != nil {
+			go func() {
+				if err := h.email.SendAppointmentCompletion(apt); err != nil {
+					log.Printf("Failed to send completion email: %v", err)
+				}
+			}()
+		}
+	}
+
 	respondJSON(w, http.StatusOK, models.APIResponse{
 		Success: true,
 		Message: "Appointment status updated",
+	})
+}
+
+// UpdateAppointmentNotes updates the notes of an appointment
+func (h *AdminHandlers) UpdateAppointmentNotes(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	var req models.UpdateNotesRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondJSON(w, http.StatusBadRequest, models.APIResponse{
+			Success: false,
+			Error:   "Invalid request body",
+		})
+		return
+	}
+
+	if err := h.db.UpdateAppointmentNotes(id, req.Notes); err != nil {
+		respondJSON(w, http.StatusInternalServerError, models.APIResponse{
+			Success: false,
+			Error:   "Failed to update appointment notes",
+		})
+		return
+	}
+
+	respondJSON(w, http.StatusOK, models.APIResponse{
+		Success: true,
+		Message: "Appointment notes updated",
 	})
 }
 
