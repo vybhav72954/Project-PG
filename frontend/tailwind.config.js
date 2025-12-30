@@ -27,9 +27,9 @@ export default {
         },
         // Warm accent for CTAs (complementary)
         cta: {
-          DEFAULT: '#E8A838',  // Warm gold/amber
-          hover: '#d49730',
-          light: '#FFF3D6'
+          DEFAULT: '#D16459',  // Warm gold/amber
+          hover: '#b85549',
+          light: '#FDE8E6'
         }
       },
       fontFamily: {
