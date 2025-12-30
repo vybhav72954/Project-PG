@@ -409,6 +409,14 @@ func (db *Database) UpdateAppointmentStatus(id, status string) error {
 	return err
 }
 
+// UpdateAppointmentNotes updates the notes of an appointment
+func (db *Database) UpdateAppointmentNotes(id, notes string) error {
+	_, err := db.conn.Exec(`
+		UPDATE appointments SET notes = ?, updated_at = ? WHERE id = ?
+	`, notes, time.Now(), id)
+	return err
+}
+
 // GetDashboardStats returns statistics for admin dashboard
 func (db *Database) GetDashboardStats() (*models.DashboardStats, error) {
 	stats := &models.DashboardStats{}

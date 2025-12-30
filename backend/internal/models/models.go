@@ -38,21 +38,21 @@ type BookingRequest struct {
 	Email            string `json:"email" validate:"required,email"`
 	Phone            string `json:"phone" validate:"required,min=10"`
 	ConsultationType string `json:"consultation_type" validate:"required,oneof=video voice"`
-	Date             string `json:"date" validate:"required"`     // YYYY-MM-DD format
+	Date             string `json:"date" validate:"required"`      // YYYY-MM-DD format
 	TimeSlot         string `json:"time_slot" validate:"required"` // HH:MM format
 }
 
 // TimeSlot represents an available time slot
 type TimeSlot struct {
-	Time      string `json:"time"`      // "09:00", "10:00", etc.
+	Time      string `json:"time"` // "09:00", "10:00", etc.
 	Available bool   `json:"available"`
 }
 
 // DaySlots represents slots for a specific day
 type DaySlots struct {
-	Date     string     `json:"date"` // YYYY-MM-DD
-	Slots    []TimeSlot `json:"slots"`
-	IsWeekend bool      `json:"is_weekend"`
+	Date      string     `json:"date"` // YYYY-MM-DD
+	Slots     []TimeSlot `json:"slots"`
+	IsWeekend bool       `json:"is_weekend"`
 }
 
 // PaymentOrder represents Razorpay order creation response
@@ -76,7 +76,7 @@ type Testimonial struct {
 	ID        string    `json:"id" db:"id"`
 	Name      string    `json:"name" db:"name"` // First name only
 	Review    string    `json:"review" db:"review"`
-	Rating    int       `json:"rating" db:"rating"` // 1-5 stars
+	Rating    int       `json:"rating" db:"rating"`       // 1-5 stars
 	Condition string    `json:"condition" db:"condition"` // What they were treated for
 	IsActive  bool      `json:"is_active" db:"is_active"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
@@ -163,4 +163,8 @@ type BlockDateRequest struct {
 // UpdateStatusRequest for updating appointment status
 type UpdateStatusRequest struct {
 	Status string `json:"status"` // confirmed, cancelled, completed
+}
+
+type UpdateNotesRequest struct {
+	Notes string `json:"notes"`
 }

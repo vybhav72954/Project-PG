@@ -52,6 +52,7 @@ export interface Appointment {
   payment_id: string;
   amount: number;
   meet_link: string;
+  notes: string;
   created_at: string;
 }
 
@@ -91,7 +92,7 @@ export interface APIResponse<T> {
 class AdminApiClient {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<APIResponse<T>> {
     const token = getToken();
-    
+
     try {
       const response = await fetch(`${API_BASE}${endpoint}`, {
         ...options,
@@ -103,14 +104,14 @@ class AdminApiClient {
       });
 
       const data = await response.json();
-      
+
       if (response.status === 401) {
         clearToken();
         if (typeof window !== 'undefined') {
           window.location.href = '/admin';
         }
       }
-      
+
       return data;
     } catch (error) {
       console.error('Admin API Error:', error);
@@ -127,13 +128,13 @@ class AdminApiClient {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password })
     });
-    
+
     const data = await response.json();
-    
+
     if (data.success && data.data?.token) {
       setToken(data.data.token);
     }
-    
+
     return data;
   }
 
@@ -150,7 +151,7 @@ class AdminApiClient {
     if (status) params.append('status', status);
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
-    
+
     const query = params.toString() ? `?${params.toString()}` : '';
     return this.request<Appointment[]>(`/appointments${query}`);
   }
@@ -159,6 +160,13 @@ class AdminApiClient {
     return this.request<void>(`/appointments/${id}/status`, {
       method: 'PATCH',
       body: JSON.stringify({ status })
+    });
+  }
+
+  async updateAppointmentNotes(id: string, notes: string): Promise<APIResponse<void>> {
+    return this.request<void>(`/appointments/${id}/notes`, {
+      method: 'PATCH',
+      body: JSON.stringify({ notes })
     });
   }
 
