@@ -42,7 +42,7 @@ func main() {
 	handler := api.NewHandler(database, calendarService, emailService, paymentService, cfg)
 
 	// Create admin handlers
-	adminHandler := api.NewAdminHandlers(database, cfg)
+	adminHandler := api.NewAdminHandlers(database, cfg, emailService)
 
 	// Setup routes
 	router := api.SetupRoutes(handler, adminHandler, cfg.Server.FrontendURL)

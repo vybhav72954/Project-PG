@@ -35,6 +35,55 @@ func (es *EmailService) SendAppointmentConfirmation(apt *models.Appointment) err
 
 	subject := "Appointment Confirmed - " + es.appConfig.ClinicName
 
+	// Different join section based on consultation type
+	var joinSection string
+	if apt.ConsultationType == "video" {
+		joinSection = fmt.Sprintf(`
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #2e7d32;">Join Your Video Consultation</h3>
+            <p>Click the button below to join your video consultation:</p>
+            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Video Call</a>
+            <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                Or copy this link: <a href="%s" style="color: #5F8575;">%s</a>
+            </p>
+        </div>
+        
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Important:</strong> Please join 5 minutes before your scheduled time.</p>
+        </div>
+        
+        <h3>Before Your Appointment</h3>
+        <ul style="color: #666;">
+            <li>Ensure you have a stable internet connection</li>
+            <li>Find a quiet, well-lit place for the consultation</li>
+            <li>Keep your medical history and current medications list ready</li>
+            <li>Note down any questions you want to ask</li>
+        </ul>`,
+			apt.MeetLink, apt.MeetLink, apt.MeetLink)
+	} else {
+		// Voice call
+		joinSection = fmt.Sprintf(`
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <h3 style="margin-top: 0; color: #1565c0;">Your Voice Consultation</h3>
+            <p>The doctor will call you at your registered phone number:</p>
+            <p style="font-size: 20px; font-weight: bold; color: #1565c0; margin: 15px 0;">%s</p>
+            <p style="font-size: 13px; color: #666;">Please ensure your phone is reachable at the scheduled time.</p>
+        </div>
+        
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Important:</strong> Please be available 5 minutes before your scheduled time.</p>
+        </div>
+        
+        <h3>Before Your Appointment</h3>
+        <ul style="color: #666;">
+            <li>Keep your phone charged and nearby</li>
+            <li>Find a quiet place for the consultation</li>
+            <li>Keep your medical history and current medications list ready</li>
+            <li>Note down any questions you want to ask</li>
+        </ul>`,
+			apt.PatientPhone)
+	}
+
 	body := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -70,34 +119,15 @@ func (es *EmailService) SendAppointmentConfirmation(apt *models.Appointment) err
             </table>
         </div>
         
-        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="margin-top: 0; color: #2e7d32;">Join Your Consultation</h3>
-            <p>Click the button below to join your video/voice consultation:</p>
-            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Meeting</a>
-            <p style="font-size: 12px; color: #666; margin-top: 15px;">
-                Or copy this link: <a href="%s" style="color: #5F8575;">%s</a>
-            </p>
-        </div>
-        
-        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0;"><strong>📌 Important:</strong> Please join 5 minutes before your scheduled time.</p>
-        </div>
-        
-        <h3>Before Your Appointment</h3>
-        <ul style="color: #666;">
-            <li>Ensure you have a stable internet connection</li>
-            <li>Find a quiet, well-lit place for the consultation</li>
-            <li>Keep your medical history and current medications list ready</li>
-            <li>Note down any questions you want to ask</li>
-        </ul>
+        %s
         
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
         
         <p style="font-size: 14px; color: #666;">
             Need to reschedule? Contact us at:<br>
-            📞 <a href="tel:%s" style="color: #5F8575;">%s</a><br>
-            💬 <a href="https://wa.me/%s" style="color: #25D366;">WhatsApp</a><br>
-            ✉️ <a href="mailto:%s" style="color: #5F8575;">%s</a>
+            Phone: <a href="tel:%s" style="color: #5F8575;">%s</a><br>
+            WhatsApp: <a href="https://wa.me/%s" style="color: #25D366;">Click here</a><br>
+            Email: <a href="mailto:%s" style="color: #5F8575;">%s</a>
         </p>
         
         <p style="margin-top: 30px;">
@@ -108,7 +138,7 @@ func (es *EmailService) SendAppointmentConfirmation(apt *models.Appointment) err
     </div>
     
     <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-        <p>© 2025 %s. All rights reserved.</p>
+        <p>%s</p>
     </div>
 </body>
 </html>
@@ -118,7 +148,7 @@ func (es *EmailService) SendAppointmentConfirmation(apt *models.Appointment) err
 		apt.StartTime.Format("Monday, January 2, 2006 at 3:04 PM"),
 		consultationType,
 		apt.Amount/100,
-		apt.MeetLink, apt.MeetLink, apt.MeetLink,
+		joinSection,
 		es.appConfig.ClinicPhone, es.appConfig.ClinicPhone,
 		es.appConfig.ClinicWhatsApp,
 		es.appConfig.ClinicEmail, es.appConfig.ClinicEmail,
@@ -138,6 +168,30 @@ func (es *EmailService) SendAppointmentReminder(apt *models.Appointment) error {
 
 	subject := "Reminder: Your Appointment in 1 Hour - " + es.appConfig.ClinicName
 
+	var joinSection string
+	if apt.ConsultationType == "video" {
+		joinSection = fmt.Sprintf(`
+        <div style="text-align: center; margin: 20px 0;">
+            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">Join Video Call Now</a>
+        </div>
+        
+        <p style="color: #666; font-size: 14px; text-align: center;">
+            Please join 5 minutes before your scheduled time.
+        </p>`,
+			apt.MeetLink)
+	} else {
+		joinSection = fmt.Sprintf(`
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0 0 10px 0;">The doctor will call you at:</p>
+            <p style="font-size: 20px; font-weight: bold; color: #1565c0; margin: 0;">%s</p>
+        </div>
+        
+        <p style="color: #666; font-size: 14px; text-align: center;">
+            Please ensure your phone is reachable.
+        </p>`,
+			apt.PatientPhone)
+	}
+
 	body := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -146,7 +200,7 @@ func (es *EmailService) SendAppointmentReminder(apt *models.Appointment) error {
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: #5F8575; padding: 20px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h2 style="color: white; margin: 0;">⏰ Appointment Reminder</h2>
+        <h2 style="color: white; margin: 0;">Appointment Reminder</h2>
     </div>
     
     <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -155,16 +209,10 @@ func (es *EmailService) SendAppointmentReminder(apt *models.Appointment) error {
         <p>This is a reminder that your consultation with <strong>%s</strong> is in <strong>1 hour</strong>.</p>
         
         <div style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <p style="font-size: 18px; margin: 0;">📅 %s</p>
+            <p style="font-size: 18px; margin: 0;">%s</p>
         </div>
         
-        <div style="text-align: center; margin: 20px 0;">
-            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 15px 40px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">Join Meeting Now</a>
-        </div>
-        
-        <p style="color: #666; font-size: 14px; text-align: center;">
-            Please join 5 minutes before your scheduled time.
-        </p>
+        %s
         
         <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
         
@@ -178,7 +226,7 @@ func (es *EmailService) SendAppointmentReminder(apt *models.Appointment) error {
 		apt.PatientName,
 		es.appConfig.DoctorName,
 		apt.StartTime.Format("Monday, January 2 at 3:04 PM"),
-		apt.MeetLink,
+		joinSection,
 		es.appConfig.ClinicPhone,
 	)
 
@@ -199,6 +247,42 @@ func (es *EmailService) SendAppointmentReminder24h(apt *models.Appointment) erro
 
 	subject := "Reminder: Your Appointment Tomorrow - " + es.appConfig.ClinicName
 
+	var joinSection string
+	var tips string
+	if apt.ConsultationType == "video" {
+		joinSection = fmt.Sprintf(`
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-weight: bold; color: #2e7d32;">Your Video Meeting Link</p>
+            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Video Call</a>
+            <p style="font-size: 12px; color: #666; margin-top: 15px;">
+                Save this link - you'll need it tomorrow!
+            </p>
+        </div>`,
+			apt.MeetLink)
+		tips = `
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #666;">
+                <li>Ensure stable internet connection</li>
+                <li>Find a quiet, well-lit space</li>
+                <li>Keep your medical history ready</li>
+                <li>Note down questions you want to ask</li>
+            </ul>`
+	} else {
+		joinSection = fmt.Sprintf(`
+        <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0 0 10px 0; font-weight: bold; color: #1565c0;">The doctor will call you at:</p>
+            <p style="font-size: 22px; font-weight: bold; color: #1565c0; margin: 10px 0;">%s</p>
+            <p style="font-size: 13px; color: #666; margin: 0;">Please ensure your phone is reachable tomorrow.</p>
+        </div>`,
+			apt.PatientPhone)
+		tips = `
+            <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #666;">
+                <li>Keep your phone charged and nearby</li>
+                <li>Find a quiet space for the call</li>
+                <li>Keep your medical history ready</li>
+                <li>Note down questions you want to ask</li>
+            </ul>`
+	}
+
 	body := fmt.Sprintf(`
 <!DOCTYPE html>
 <html>
@@ -208,7 +292,7 @@ func (es *EmailService) SendAppointmentReminder24h(apt *models.Appointment) erro
 </head>
 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
     <div style="background: linear-gradient(135deg, #5F8575 0%%, #4d6e60 100%%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
-        <h1 style="color: white; margin: 0; font-size: 24px;">📅 Appointment Tomorrow</h1>
+        <h1 style="color: white; margin: 0; font-size: 24px;">Appointment Tomorrow</h1>
     </div>
     
     <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -220,40 +304,29 @@ func (es *EmailService) SendAppointmentReminder24h(apt *models.Appointment) erro
             <h3 style="margin-top: 0; color: #5F8575;">Appointment Details</h3>
             <table style="width: 100%%; border-collapse: collapse;">
                 <tr>
-                    <td style="padding: 8px 0; color: #666;">📅 Date & Time:</td>
+                    <td style="padding: 8px 0; color: #666;">Date & Time:</td>
                     <td style="padding: 8px 0; font-weight: bold;">%s</td>
                 </tr>
                 <tr>
-                    <td style="padding: 8px 0; color: #666;">📞 Consultation Type:</td>
+                    <td style="padding: 8px 0; color: #666;">Consultation Type:</td>
                     <td style="padding: 8px 0; font-weight: bold;">%s</td>
                 </tr>
             </table>
         </div>
         
-        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center;">
-            <p style="margin: 0 0 15px 0; font-weight: bold; color: #2e7d32;">Your Meeting Link</p>
-            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Join Meeting</a>
-            <p style="font-size: 12px; color: #666; margin-top: 15px;">
-                Save this link - you'll need it tomorrow!
-            </p>
-        </div>
+        %s
         
         <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <p style="margin: 0; font-weight: bold; color: #e65100;">📌 Before Your Appointment:</p>
-            <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #666;">
-                <li>Ensure stable internet connection</li>
-                <li>Find a quiet, well-lit space</li>
-                <li>Keep your medical history ready</li>
-                <li>Note down questions you want to ask</li>
-            </ul>
+            <p style="margin: 0; font-weight: bold; color: #e65100;">Before Your Appointment:</p>
+            %s
         </div>
         
         <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
         
         <p style="font-size: 14px; color: #666;">
             Need to reschedule? Contact us at least 12 hours before:<br>
-            📞 <a href="tel:%s" style="color: #5F8575;">%s</a><br>
-            💬 <a href="https://wa.me/%s" style="color: #25D366;">WhatsApp</a>
+            Phone: <a href="tel:%s" style="color: #5F8575;">%s</a><br>
+            WhatsApp: <a href="https://wa.me/%s" style="color: #25D366;">Click here</a>
         </p>
         
         <p style="margin-top: 30px;">
@@ -264,7 +337,7 @@ func (es *EmailService) SendAppointmentReminder24h(apt *models.Appointment) erro
     </div>
     
     <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
-        <p>© 2025 %s. All rights reserved.</p>
+        <p>%s</p>
     </div>
 </body>
 </html>
@@ -273,9 +346,94 @@ func (es *EmailService) SendAppointmentReminder24h(apt *models.Appointment) erro
 		es.appConfig.DoctorName,
 		apt.StartTime.Format("Monday, January 2, 2006 at 3:04 PM"),
 		consultationType,
-		apt.MeetLink,
+		joinSection,
+		tips,
 		es.appConfig.ClinicPhone, es.appConfig.ClinicPhone,
 		es.appConfig.ClinicWhatsApp,
+		es.appConfig.DoctorName,
+		es.appConfig.ClinicName,
+		es.appConfig.ClinicName,
+	)
+
+	return es.sendEmail(apt.PatientEmail, subject, body)
+}
+
+// SendAppointmentCompletion sends a thank you email after appointment is marked complete
+func (es *EmailService) SendAppointmentCompletion(apt *models.Appointment) error {
+	if es.config.SenderEmail == "" || es.config.Password == "" {
+		fmt.Println("Email service not configured, skipping completion email")
+		return nil
+	}
+
+	consultationType := "video consultation"
+	if apt.ConsultationType == "voice" {
+		consultationType = "voice consultation"
+	}
+
+	subject := "Thank You for Your Visit - " + es.appConfig.ClinicName
+
+	// Get the frontend URL for booking link (remove /api if present)
+	bookingLink := "https://friends2health.com/appointment"
+
+	body := fmt.Sprintf(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+    <div style="background: linear-gradient(135deg, #5F8575 0%%, #4d6e60 100%%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
+        <h1 style="color: white; margin: 0;">Thank You!</h1>
+    </div>
+    
+    <div style="background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px;">
+        <p style="font-size: 16px;">Dear <strong>%s</strong>,</p>
+        
+        <p>Thank you for your %s with <strong>%s</strong> on %s.</p>
+        
+        <p>We hope the consultation was helpful. Your health and well-being are our top priority, and we are always here to support you on your healing journey.</p>
+        
+        <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 25px 0; text-align: center;">
+            <h3 style="margin-top: 0; color: #2e7d32;">Follow-up Consultation</h3>
+            <p style="margin-bottom: 15px;">Homeopathy works best with regular follow-ups. When you're ready for your next appointment, simply click below:</p>
+            <a href="%s" style="display: inline-block; background: #5F8575; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">Book Follow-up</a>
+        </div>
+        
+        <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Reminder:</strong> Please continue taking your medicines as prescribed. If you have any questions about your treatment, feel free to reach out.</p>
+        </div>
+        
+        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+        
+        <p style="font-size: 14px; color: #666;">
+            Questions about your treatment? Contact us:<br>
+            Phone: <a href="tel:%s" style="color: #5F8575;">%s</a><br>
+            WhatsApp: <a href="https://wa.me/%s" style="color: #25D366;">Chat with us</a><br>
+            Email: <a href="mailto:%s" style="color: #5F8575;">%s</a>
+        </p>
+        
+        <p style="margin-top: 30px;">
+            Wishing you good health,<br>
+            <strong>%s</strong><br>
+            %s
+        </p>
+    </div>
+    
+    <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+        <p>2025 %s. All rights reserved.</p>
+    </div>
+</body>
+</html>
+`,
+		apt.PatientName,
+		consultationType,
+		es.appConfig.DoctorName,
+		apt.StartTime.Format("Monday, January 2, 2006"),
+		bookingLink,
+		es.appConfig.ClinicPhone, es.appConfig.ClinicPhone,
+		es.appConfig.ClinicWhatsApp,
+		es.appConfig.ClinicEmail, es.appConfig.ClinicEmail,
 		es.appConfig.DoctorName,
 		es.appConfig.ClinicName,
 		es.appConfig.ClinicName,

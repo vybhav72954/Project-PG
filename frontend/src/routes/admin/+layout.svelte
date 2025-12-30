@@ -2,7 +2,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { onMount, onDestroy } from 'svelte';
-  import { adminApi, isLoggedIn } from '$lib/adminApi';
+  import { adminApi, isLoggedIn, clearToken } from '$lib/adminApi';
   import { browser } from '$app/environment';
 
   let isAuthenticated = false;
@@ -11,7 +11,7 @@
   let loginPassword = '';
   let loginError = '';
 
-  const IDLE_TIMEOUT = 1 * 60 * 1000;
+  const IDLE_TIMEOUT = 15 * 60 * 1000;
   let idleTimer: number | undefined;
 
   const navItems = [
@@ -52,12 +52,30 @@
     }
   }
 
-  onMount(() => {
-    isAuthenticated = isLoggedIn();
-    loading = false;
-    if (isAuthenticated) {
-      setupIdleDetection();
+  onMount(async () => {
+    // Check if token exists in localStorage
+    if (!isLoggedIn()) {
+      loading = false;
+      return;
     }
+
+    // Validate token by making an API call to backend
+    try {
+      const response = await adminApi.getDashboard();
+      if (response.success) {
+        isAuthenticated = true;
+        setupIdleDetection();
+      } else {
+        // Token invalid or expired, clear it
+        clearToken();
+        isAuthenticated = false;
+      }
+    } catch {
+      clearToken();
+      isAuthenticated = false;
+    }
+
+    loading = false;
   });
 
   onDestroy(() => {
