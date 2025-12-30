@@ -115,6 +115,9 @@ func (db *Database) initialize() error {
 	db.conn.Exec(`ALTER TABLE appointments ADD COLUMN reminder_24h_sent INTEGER DEFAULT 0`)
 	db.conn.Exec(`ALTER TABLE appointments ADD COLUMN reminder_1h_sent INTEGER DEFAULT 0`)
 
+	// Migration: Add notes column for doctor notes
+	db.conn.Exec(`ALTER TABLE appointments ADD COLUMN notes TEXT DEFAULT ''`)
+
 	// Insert default testimonials if none exist
 	var count int
 	err = db.conn.QueryRow("SELECT COUNT(*) FROM testimonials").Scan(&count)
@@ -219,13 +222,13 @@ func (db *Database) GetAppointment(id string) (*models.Appointment, error) {
 			consultation_type, start_time, end_time, status, payment_status,
 			COALESCE(payment_id, ''), COALESCE(payment_order_id, ''), amount,
 			COALESCE(meet_link, ''), COALESCE(calendar_event_id, ''),
-			created_at, updated_at
+			COALESCE(notes, ''), created_at, updated_at
 		FROM appointments WHERE id = ?
 	`, id).Scan(
 		&apt.ID, &apt.PatientID, &apt.PatientName, &apt.PatientEmail, &apt.PatientPhone,
 		&apt.ConsultationType, &apt.StartTime, &apt.EndTime, &apt.Status, &apt.PaymentStatus,
 		&apt.PaymentID, &apt.PaymentOrderID, &apt.Amount,
-		&apt.MeetLink, &apt.CalendarEventID,
+		&apt.MeetLink, &apt.CalendarEventID, &apt.Notes,
 		&apt.CreatedAt, &apt.UpdatedAt,
 	)
 
@@ -354,7 +357,7 @@ func (db *Database) GetAllAppointments(status string, startDate, endDate time.Ti
 			consultation_type, start_time, end_time, status, payment_status,
 			COALESCE(payment_id, ''), COALESCE(payment_order_id, ''), amount,
 			COALESCE(meet_link, ''), COALESCE(calendar_event_id, ''),
-			created_at, updated_at
+			COALESCE(notes, ''), created_at, updated_at
 		FROM appointments
 		WHERE 1=1
 	`
@@ -390,7 +393,7 @@ func (db *Database) GetAllAppointments(status string, startDate, endDate time.Ti
 			&apt.ID, &apt.PatientID, &apt.PatientName, &apt.PatientEmail, &apt.PatientPhone,
 			&apt.ConsultationType, &apt.StartTime, &apt.EndTime, &apt.Status, &apt.PaymentStatus,
 			&apt.PaymentID, &apt.PaymentOrderID, &apt.Amount,
-			&apt.MeetLink, &apt.CalendarEventID,
+			&apt.MeetLink, &apt.CalendarEventID, &apt.Notes,
 			&apt.CreatedAt, &apt.UpdatedAt,
 		); err != nil {
 			return nil, err
@@ -496,7 +499,7 @@ func (db *Database) GetAllPatients() ([]models.PatientSummary, error) {
 			MAX(start_time) as last_appointment,
 			MIN(created_at) as first_visit
 		FROM appointments
-		WHERE status = 'confirmed'
+		WHERE status IN ('confirmed', 'completed', 'cancelled')
 		GROUP BY patient_email
 		ORDER BY last_appointment DESC
 	`)
@@ -568,7 +571,7 @@ func (db *Database) GetPatientAppointments(email string) ([]models.Appointment, 
 			consultation_type, start_time, end_time, status, payment_status,
 			COALESCE(payment_id, ''), COALESCE(payment_order_id, ''), amount,
 			COALESCE(meet_link, ''), COALESCE(calendar_event_id, ''),
-			created_at, updated_at
+			COALESCE(notes, ''), created_at, updated_at
 		FROM appointments
 		WHERE patient_email = ?
 		ORDER BY start_time DESC
@@ -585,7 +588,7 @@ func (db *Database) GetPatientAppointments(email string) ([]models.Appointment, 
 			&apt.ID, &apt.PatientID, &apt.PatientName, &apt.PatientEmail, &apt.PatientPhone,
 			&apt.ConsultationType, &apt.StartTime, &apt.EndTime, &apt.Status, &apt.PaymentStatus,
 			&apt.PaymentID, &apt.PaymentOrderID, &apt.Amount,
-			&apt.MeetLink, &apt.CalendarEventID,
+			&apt.MeetLink, &apt.CalendarEventID, &apt.Notes,
 			&apt.CreatedAt, &apt.UpdatedAt,
 		); err != nil {
 			return nil, err

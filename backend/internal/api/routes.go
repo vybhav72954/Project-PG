@@ -159,6 +159,7 @@ func SetupRoutes(h *Handler, adminH *AdminHandlers, frontendURL string) http.Han
 				// Appointments management
 				r.Get("/appointments", adminH.GetAppointments)
 				r.Patch("/appointments/{id}/status", adminH.UpdateAppointmentStatus)
+				r.Patch("/appointments/{id}/notes", adminH.UpdateAppointmentNotes)
 
 				// Patients
 				r.Get("/patients", adminH.GetPatients)

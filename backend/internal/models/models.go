@@ -18,16 +18,17 @@ type Appointment struct {
 	PatientName      string    `json:"patient_name" db:"patient_name"`
 	PatientEmail     string    `json:"patient_email" db:"patient_email"`
 	PatientPhone     string    `json:"patient_phone" db:"patient_phone"`
-	ConsultationType string    `json:"consultation_type" db:"consultation_type"` // video or voice
+	ConsultationType string    `json:"consultation_type" db:"consultation_type"`
 	StartTime        time.Time `json:"start_time" db:"start_time"`
 	EndTime          time.Time `json:"end_time" db:"end_time"`
-	Status           string    `json:"status" db:"status"` // pending_payment, confirmed, cancelled, completed
+	Status           string    `json:"status" db:"status"`
 	PaymentStatus    string    `json:"payment_status" db:"payment_status"`
 	PaymentID        string    `json:"payment_id" db:"payment_id"`
 	PaymentOrderID   string    `json:"payment_order_id" db:"payment_order_id"`
-	Amount           int       `json:"amount" db:"amount"` // in paise
+	Amount           int       `json:"amount" db:"amount"`
 	MeetLink         string    `json:"meet_link" db:"meet_link"`
 	CalendarEventID  string    `json:"calendar_event_id" db:"calendar_event_id"`
+	Notes            string    `json:"notes" db:"notes"` // <-- ADD THIS LINE
 	CreatedAt        time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt        time.Time `json:"updated_at" db:"updated_at"`
 }
