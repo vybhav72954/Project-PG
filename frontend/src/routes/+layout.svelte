@@ -168,17 +168,17 @@
     </div>
   </footer>
 
-  <!-- WhatsApp Floating Button -->
-  <a
-    href="https://wa.me/{contact.whatsapp}?text=Hi%20Dr.%20Aditi%2C%20I%20would%20like%20to%20inquire%20about%20a%20consultation."
-    target="_blank"
-    rel="noopener noreferrer"
-    class="fixed bottom-6 right-6 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all z-50 group"
-    aria-label="Chat on WhatsApp"
-  >
-    <i class="fab fa-whatsapp text-2xl"></i>
-    <span class="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-white text-gray-800 px-3 py-2 rounded-lg shadow-md text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-      Chat with us!
-    </span>
-  </a>
+    <!-- WhatsApp Floating Button -->
+    <a
+      href="https://wa.me/{contact.whatsapp}?text=Hi%20Dr.%20Aditi%2C%20I%20would%20like%20to%20inquire%20about%20a%20consultation."
+      target="_blank"
+      rel="noopener noreferrer"
+      class="fixed bottom-20 right-6 bg-green-500 text-white w-14 h-14 flex items-center justify-center rounded-full shadow-lg hover:bg-green-600 hover:scale-110 transition-all z-50 group border-4 border-white"
+      aria-label="Chat on WhatsApp"
+    >
+      <i class="fab fa-whatsapp text-2xl"></i>
+      <span class="absolute right-full mr-3 top-1/2 -translate-y-1/2 bg-white text-gray-800 px-3 py-2 rounded-lg shadow-md text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+        Chat with us!
+      </span>
+    </a>
 {/if}
