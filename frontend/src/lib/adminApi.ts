@@ -5,7 +5,7 @@ const API_BASE = '/api/admin';
 // Get stored admin token
 function getToken(): string | null {
   if (typeof window !== 'undefined') {
-    return localStorage.getItem('admin_token');
+    return sessionStorage.getItem('admin_token');
   }
   return null;
 }
@@ -13,14 +13,14 @@ function getToken(): string | null {
 // Set admin token
 export function setToken(token: string): void {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('admin_token', token);
+    sessionStorage.setItem('admin_token', token);
   }
 }
 
 // Clear admin token
 export function clearToken(): void {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('admin_token');
+    sessionStorage.removeItem('admin_token');
   }
 }
 
