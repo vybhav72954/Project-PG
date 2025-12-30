@@ -138,7 +138,6 @@
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notes</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
           </tr>
         </thead>
@@ -158,13 +157,6 @@
               <td class="px-6 py-4 font-medium">₹{apt.amount / 100}</td>
               <td class="px-6 py-4">
                 <span class="px-2 py-1 text-xs font-medium rounded-full {getStatusColor(apt.status)}">{formatStatus(apt.status)}</span>
-              </td>
-              <td class="px-6 py-4">
-                {#if apt.notes}
-                  <p class="text-sm text-gray-600 max-w-xs truncate" title={apt.notes}>{apt.notes}</p>
-                {:else}
-                  <span class="text-gray-400 text-sm">-</span>
-                {/if}
               </td>
               <td class="px-6 py-4">
                 <div class="flex space-x-2">
@@ -200,9 +192,6 @@
             <div><p class="text-gray-500">Type</p><p class="font-medium capitalize">{apt.consultation_type}</p></div>
             <div><p class="text-gray-500">Amount</p><p class="font-medium">₹{apt.amount / 100}</p></div>
           </div>
-          {#if apt.notes}
-            <div class="mt-3 pt-3 border-t"><p class="text-gray-500 text-xs">Notes</p><p class="text-sm text-gray-700">{apt.notes}</p></div>
-          {/if}
           <div class="flex space-x-2 mt-4 pt-4 border-t">
             {#if apt.status === 'confirmed'}
               <button on:click={() => updateStatus(apt.id, 'completed')} class="flex-1 bg-green-100 text-green-700 py-2 rounded-lg hover:bg-green-200"><i class="fas fa-check mr-1"></i> Complete</button>

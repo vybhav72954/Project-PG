@@ -186,14 +186,20 @@
                       {apt.status.replace('_', ' ')}
                     </span>
                   </div>
-                  <div class="flex justify-between text-sm">
-                    <span class="text-gray-500">Amount: ₹{apt.amount / 100}</span>
-                    {#if apt.meet_link}
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-500">Amount: Rs. {apt.amount / 100}</span>
+                    {#if apt.consultation_type === 'video' && apt.meet_link}
                       <a href={apt.meet_link} target="_blank" rel="noopener" class="text-blue-600 hover:underline">
                         <i class="fas fa-video mr-1"></i>Meeting Link
                       </a>
                     {/if}
                   </div>
+                  {#if apt.notes}
+                    <div class="mt-3 pt-3 border-t border-gray-100">
+                      <p class="text-xs text-gray-500 uppercase mb-1">Doctor's Notes</p>
+                      <p class="text-sm text-gray-700 bg-gray-50 p-2 rounded">{apt.notes}</p>
+                    </div>
+                  {/if}
                 </div>
               {/each}
             </div>
