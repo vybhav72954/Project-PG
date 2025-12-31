@@ -3,30 +3,33 @@
   import { booking, type BookingState } from '$lib/stores';
   import { get } from 'svelte/store';
   import { goto } from '$app/navigation';
+  import { siteConfig } from '$lib/config';
+
+  const { contact } = siteConfig;
 
   let bookingData: BookingState;
   let loading = true;
 
   onMount(() => {
     bookingData = get(booking);
-    
+
     // If no booking data, redirect to appointment page
     if (!bookingData.appointmentId) {
       goto('/appointment');
       return;
     }
-    
+
     loading = false;
   });
 
   function formatDate(dateStr: string | null): string {
     if (!dateStr) return '';
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-IN', { 
-      weekday: 'long', 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
+    return date.toLocaleDateString('en-IN', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
     });
   }
 
@@ -75,7 +78,7 @@
             <i class="fas fa-calendar-check text-primary-500"></i>
             Appointment Details
           </h2>
-          
+
           <div class="space-y-4">
             <div class="flex justify-between py-2 border-b border-gray-100">
               <span class="text-gray-600">Patient Name</span>
@@ -102,8 +105,8 @@
           </div>
         </div>
 
-        <!-- Meeting Link -->
-        {#if bookingData.meetLink}
+        <!-- Meeting Link (Video) or Call Info (Voice) -->
+        {#if bookingData.consultationType === 'video' && bookingData.meetLink}
           <div class="bg-primary-50 border border-primary-200 rounded-xl p-6 mb-6">
             <h3 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
               <i class="fas fa-video text-primary-600"></i>
@@ -112,15 +115,32 @@
             <p class="text-sm text-gray-600 mb-3">
               Join the consultation at your scheduled time using this link:
             </p>
-            <a 
-              href={bookingData.meetLink} 
-              target="_blank" 
+            <a
+              href={bookingData.meetLink}
+              target="_blank"
               rel="noopener"
               class="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium break-all"
             >
               {bookingData.meetLink}
               <i class="fas fa-external-link-alt text-sm"></i>
             </a>
+          </div>
+        {:else if bookingData.consultationType === 'voice'}
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+            <h3 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+              <i class="fas fa-phone-alt text-blue-600"></i>
+              Voice Call Consultation
+            </h3>
+            <p class="text-gray-600 mb-3">
+              Dr. Aditi will call you at your registered phone number:
+            </p>
+            <p class="text-xl font-bold text-blue-600">
+              <i class="fas fa-mobile-alt mr-2"></i>
+              {bookingData.phone}
+            </p>
+            <p class="text-sm text-gray-500 mt-3">
+              Please ensure your phone is reachable at the scheduled time.
+            </p>
           </div>
         {/if}
 
@@ -132,10 +152,17 @@
               <i class="fas fa-envelope text-primary-500 mt-1"></i>
               <span>A confirmation email has been sent to <strong>{bookingData.email}</strong></span>
             </li>
-            <li class="flex items-start gap-3">
-              <i class="fas fa-clock text-primary-500 mt-1"></i>
-              <span>Please join the consultation 5 minutes before the scheduled time</span>
-            </li>
+            {#if bookingData.consultationType === 'video'}
+              <li class="flex items-start gap-3">
+                <i class="fas fa-clock text-primary-500 mt-1"></i>
+                <span>Please join the video call 5 minutes before the scheduled time</span>
+              </li>
+            {:else}
+              <li class="flex items-start gap-3">
+                <i class="fas fa-phone text-primary-500 mt-1"></i>
+                <span>Keep your phone reachable at the scheduled time - Dr. Aditi will call you</span>
+              </li>
+            {/if}
             <li class="flex items-start gap-3">
               <i class="fas fa-file-medical text-primary-500 mt-1"></i>
               <span>Keep your medical history and current medications handy</span>
@@ -159,10 +186,10 @@
         <div class="text-center mt-8 text-gray-600">
           <p>Need help? Contact us:</p>
           <div class="flex justify-center gap-4 mt-2">
-            <a href="tel:+919877505344" class="text-primary-600 hover:text-primary-700">
-              <i class="fas fa-phone mr-1"></i> +91-9877505344
+            <a href="tel:{contact.phoneRaw}" class="text-primary-600 hover:text-primary-700">
+              <i class="fas fa-phone mr-1"></i> {contact.phone}
             </a>
-            <a href="https://wa.me/919877505344" class="text-primary-600 hover:text-primary-700">
+            <a href="https://wa.me/{contact.whatsapp}" class="text-primary-600 hover:text-primary-700">
               <i class="fab fa-whatsapp mr-1"></i> WhatsApp
             </a>
           </div>
