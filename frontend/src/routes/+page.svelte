@@ -101,21 +101,21 @@
 </svelte:head>
 
 <!-- Hero Section - Meet Dr. Aditi (FIRST) -->
-<section class="bg-gradient-hero min-h-[600px] flex items-center">
+<section class="bg-gradient-hero min-h-[600px] flex items-center py-8 lg:py-0">
   <div class="container-custom w-full">
-    <div class="grid lg:grid-cols-2 gap-12 items-center">
+    <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       <!-- Left: Content -->
-      <div class="text-center lg:text-left">
+      <div class="text-center lg:text-left order-2 lg:order-1">
         <p class="text-primary-600 font-medium tracking-wide mb-2">
           Welcome to Friends2health Homoeo Clinic
         </p>
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
           Meet <span class="text-primary-500">{doctor.name}</span>
         </h1>
-        <p class="text-lg text-gray-600 mb-2">
+        <p class="text-base lg:text-lg text-gray-600 mb-2">
           {doctor.title} • {doctor.experience} Years Experience
         </p>
-        <p class="text-gray-600 mb-6 max-w-lg">
+        <p class="text-gray-600 mb-6 max-w-lg mx-auto lg:mx-0">
           Dedicated homeopathic physician providing natural, gentle, and side-effect free treatment.
           Experience holistic healing from the comfort of your home.
         </p>
@@ -141,24 +141,24 @@
         </div>
       </div>
 
-      <!-- Right: Doctor Image -->
-      <div class="hidden lg:flex justify-center">
+      <!-- Right: Doctor Image (NOW VISIBLE ON ALL SCREENS) -->
+      <div class="flex justify-center order-1 lg:order-2">
         <div class="relative">
-          <div class="w-96 h-[480px] bg-gradient-green rounded-2xl overflow-hidden shadow-xl">
+          <div class="w-64 h-80 sm:w-72 sm:h-96 lg:w-96 lg:h-[480px] bg-gradient-green rounded-2xl overflow-hidden shadow-xl">
             <img
               src="/images/home-page_img.jpg"
               alt="Dr. Aditi Singh - Homeopathic Physician"
               class="w-full h-full object-cover"
             />
             <!-- Overlay with name -->
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-              <p class="text-white font-bold text-xl">{doctor.name}</p>
-              <p class="text-white/80 text-sm">{doctor.title}</p>
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
+              <p class="text-white font-bold text-lg lg:text-xl">{doctor.name}</p>
+              <p class="text-white/80 text-xs lg:text-sm">{doctor.title}</p>
             </div>
           </div>
-          <!-- Decorative elements -->
-          <div class="absolute -top-4 -right-4 w-20 h-20 bg-cta/30 rounded-full"></div>
-          <div class="absolute -bottom-6 -left-6 w-28 h-28 bg-primary-200 rounded-full opacity-60"></div>
+          <!-- Decorative elements (hidden on small mobile) -->
+          <div class="hidden sm:block absolute -top-4 -right-4 w-20 h-20 bg-cta/30 rounded-full"></div>
+          <div class="hidden sm:block absolute -bottom-6 -left-6 w-28 h-28 bg-primary-200 rounded-full opacity-60"></div>
         </div>
       </div>
     </div>
