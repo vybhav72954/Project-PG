@@ -124,7 +124,6 @@ lerna-debug.log*
 # VSCode
 .vscode/
 *.code-workspace
-frontend/.vscode
 
 # JetBrains IDEs (IntelliJ, GoLand, WebStorm)
 .idea/
