@@ -6,20 +6,20 @@
 
   // Doctor image carousel
   let currentDoctorImage = 0;
-  const doctorImages = [
-    {
-      src: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop&crop=top',
-      alt: 'Dr. Aditi Singh - Consultation'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=500&fit=crop&crop=top',
-      alt: 'Dr. Aditi Singh - With Patient'
-    },
-    {
-      src: 'https://images.unsplash.com/photo-1651008376811-b90baee60c1f?w=400&h=500&fit=crop&crop=top',
-      alt: 'Dr. Aditi Singh - Clinic'
-    }
-  ];
+    const doctorImages = [
+      {
+        src: '/images/carousel_img1.jpg',
+        alt: 'Dr. Aditi Singh - Doctor'
+      },
+      {
+        src: '/images/carousel_img2.jpg',
+        alt: 'Dr. Aditi Singh - Badge'
+      },
+      {
+        src: '/images/carousel_img3.jpg',
+        alt: 'Dr. Aditi Singh - Clinic'
+      }
+    ];
 
   // Auto-rotate doctor images
   onMount(() => {
@@ -49,6 +49,14 @@
       description: 'Advanced specialization in homeopathic medicine with focus on chronic diseases and constitutional treatment.'
     }
   ];
+
+    const achievements = [
+      {
+        title: 'AIR 37 in AIAPGET 2025',
+        description: 'All India Rank 37 in All India AYUSH Post Graduate Entrance Test',
+        icon: 'fa-trophy'
+      }
+    ];
 
   const expertise = [
     'Chronic Skin Disorders',
@@ -180,8 +188,20 @@
       <h2 class="section-title">Education & Qualifications</h2>
       <p class="section-subtitle">Trained at India's premier homeopathic institutions</p>
     </div>
-
-    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        {#each achievements as achievement}
+          <div class="max-w-2xl mx-auto mb-10">
+            <div class="bg-gradient-to-r from-cta/20 to-primary-100 border-2 border-cta/30 rounded-2xl p-6 flex items-center gap-4">
+              <div class="w-16 h-16 bg-cta rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="fas {achievement.icon} text-2xl text-white"></i>
+              </div>
+              <div>
+                <h3 class="text-xl font-bold text-gray-900">{achievement.title}</h3>
+                <p class="text-gray-600">{achievement.description}</p>
+              </div>
+            </div>
+          </div>
+        {/each}
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
       {#each qualifications as qual}
         <div class="card-hover p-8">
           <div class="flex items-start gap-4">

@@ -146,7 +146,7 @@
         <div class="relative">
           <div class="w-96 h-[480px] bg-gradient-green rounded-2xl overflow-hidden shadow-xl">
             <img
-              src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=500&fit=crop&crop=top"
+              src="/images/home-page_img.jpg"
               alt="Dr. Aditi Singh - Homeopathic Physician"
               class="w-full h-full object-cover"
             />
