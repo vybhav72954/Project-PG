@@ -313,14 +313,14 @@
           <p class="text-gray-600">
             Results from homeopathic treatment vary from person to person. The success stories and testimonials on our website represent individual experiences and are not guarantees of specific outcomes.
           </p>
-
-          <h3 class="text-lg font-semibold text-gray-900 mt-8">Practitioner Credentials</h3>
-          <div class="bg-gray-50 rounded-lg p-4">
-            <p class="text-gray-700 font-medium">{doctor.name}</p>
-            <p class="text-gray-600">{doctor.title}</p>
-            <p class="text-gray-600 text-sm mt-2">BHMS - {doctor.bhmsCollege}</p>
-            <p class="text-gray-600 text-sm">MD - {doctor.mdCollege}</p>
-          </div>
+            <h3 class="text-lg font-semibold text-gray-900 mt-8">Practitioner Credentials</h3>
+            <div class="bg-gray-50 rounded-lg p-4">
+              <p class="text-gray-700 font-medium">{doctor.name}</p>
+              <p class="text-gray-600">{doctor.title}</p>
+              <p class="text-gray-600 text-sm mt-2">BHMS - {doctor.bhmsCollege}</p>
+              <p class="text-gray-600 text-sm">MD - {doctor.mdCollege}</p>
+              <p class="text-gray-600 text-sm">Registration No: {doctor.registrationNumber}</p>
+            </div>
         </div>
       </article>
 

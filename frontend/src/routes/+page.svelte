@@ -100,7 +100,7 @@
   <title>Friends2health Homoeo Clinic | Dr. Aditi Singh</title>
 </svelte:head>
 
-<!-- Hero Section - Meet Dr. Aditi (FIRST) -->
+<!-- Hero Section - Meet Dr. Aditi -->
 <section class="bg-gradient-hero min-h-[600px] flex items-center py-8 lg:py-0">
   <div class="container-custom w-full">
     <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -141,7 +141,7 @@
         </div>
       </div>
 
-      <!-- Right: Doctor Image (NOW VISIBLE ON ALL SCREENS) -->
+      <!-- Right: Doctor Image (VISIBLE ON ALL SCREENS) -->
       <div class="flex justify-center order-1 lg:order-2">
         <div class="relative">
           <div class="w-64 h-80 sm:w-72 sm:h-96 lg:w-96 lg:h-[480px] bg-gradient-green rounded-2xl overflow-hidden shadow-xl">
