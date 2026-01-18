@@ -1,4 +1,3 @@
-// Site configuration - update these values as needed
 export const siteConfig = {
     clinicName: 'Friends2health Homoeo Clinic',
     clinicShortName: 'F2H',
@@ -8,7 +7,8 @@ export const siteConfig = {
         title: 'BHMS, MD (Hom)',
         experience: '3+',
         bhmsCollege: 'Homoeopathic Medical College & Hospital, Chandigarh',
-        mdCollege: 'National Institute of Homoeopathy, New Delhi'
+        mdCollege: 'National Institute of Homoeopathy, New Delhi',
+        registrationNumber: 'NRH/0081645'
     },
 
     contact: {

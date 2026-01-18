@@ -69,7 +69,7 @@
     'Pediatric Care'
   ];
 
-  const approach = [
+const approach = [
     {
       title: 'Detailed Case Taking',
       description: 'Understanding your complete health history, lifestyle, and symptoms.',
@@ -89,6 +89,11 @@
       title: 'Follow-up Care',
       description: 'Regular monitoring and adjustment of treatment for best results.',
       icon: 'fa-calendar-check'
+    },
+    {
+      title: 'Diet Management',
+      description: 'Personalized dietary suggestions and nutrition advice to support your recovery.',
+      icon: 'fa-apple-whole'
     }
   ];
 </script>
@@ -228,7 +233,7 @@
       <p class="section-subtitle">A systematic approach to holistic healing</p>
     </div>
 
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid md:grid-cols-2 lg:grid-cols-5 gap-6">
       {#each approach as item, index}
         <div class="bg-white p-6 rounded-xl shadow-sm text-center">
           <div class="relative inline-block mb-4">
